@@ -1,0 +1,23 @@
+{
+    "0-TheFool":{"image":"https://static.wikitide.net/onemorenightwiki/c/c0/KonoCard.png","weight":15,"cap":2},
+    "1-TheMagician":{"image":"https://static.wikitide.net/onemorenightwiki/d/d3/RoxieCard.png","weight":5,"cap":2},
+    "3-TheEmpress":{"image":"https://static.wikitide.net/onemorenightwiki/d/d9/DestroymanCard.png","weight":2,"cap":1},
+    "4-TheEmperor":{"image":"https://static.wikitide.net/onemorenightwiki/7/7e/MikepikeCard.png","weight":4,"cap":1},
+    "5-TheHierophant":{"image":"https://static.wikitide.net/onemorenightwiki/0/0c/DryCard.png","weight":10,"cap":2},
+    "6?-TheLinked":{"image":"https://static.wikitide.net/onemorenightwiki/a/ac/LinkedCard.png","weight":7,"cap":2},
+    "7-TheChariot":{"image":"https://static.wikitide.net/onemorenightwiki/f/f9/OliCard.png","weight":3,"cap":1},
+    "8-Strength":{"image":"https://static.wikitide.net/onemorenightwiki/7/74/StormCard.png","weight":7,"cap":1},
+    "9-TheHermit":{"image":"https://static.wikitide.net/onemorenightwiki/9/92/IsraCard.png","weight":7,"cap":2},
+    "10-WheelOfFortune":{"image":"https://static.wikitide.net/onemorenightwiki/6/63/WOFCard.png","weight":"13 (+40 if bought before)","cap":1},
+    "11-Justice":{"image":"https://static.wikitide.net/onemorenightwiki/9/97/PuppetCard.png","weight":5,"cap":1},
+    "12?-TheOneWhoDied":{"image":"https://static.wikitide.net/onemorenightwiki/b/b4/JanCard.png","weight":8,"cap":1},
+    "13-Death":{"image":"https://static.wikitide.net/onemorenightwiki/1/1e/FranCard.png","weight":7,"cap":1},
+    "14-Temperance":{"image":"https://static.wikitide.net/onemorenightwiki/5/51/UpliftCard.png","weight":7,"cap":1},
+    "15-TheDevil":{"image":"https://static.wikitide.net/onemorenightwiki/5/58/RaptorCard.png","weight":10,"cap":1},
+    "16-TheTower":{"image":"https://static.wikitide.net/onemorenightwiki/f/fd/BadCard.png","weight":10,"cap":1},
+    "17-TheStar":{"image":"https://static.wikitide.net/onemorenightwiki/a/a7/JordiCard.png","weight":12,"cap":1},
+    "18-TheMoon":{"image":"https://static.wikitide.net/onemorenightwiki/9/92/MangoCard.png","weight":5,"cap":1},
+    "19-TheSun":{"image":"https://static.wikitide.net/onemorenightwiki/9/96/WormcaveCard.png","weight":9,"cap":1},
+    "20-Judgement":{"image":"https://static.wikitide.net/onemorenightwiki/1/1f/MyselfCard.png","weight":6,"cap":1},
+    "21-TheWorld":{"image":"https://static.wikitide.net/onemorenightwiki/2/2a/ZGuestoCard.png","weight":10,"cap":1}
+}
