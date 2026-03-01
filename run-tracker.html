@@ -535,6 +535,9 @@
                 // E.g., "IncreasedPower" -> "Increased Power"
                 let displayName = itemId.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
 
+                // Remove the "WOF " prefix if it exists
+                if (displayName.startsWith("WOF ")) displayName = displayName.replace("WOF ", "");
+
                 // Replace numbers with Roman Numerals (e.g., "0-TheFool" -> "0-The Fool", wait, 0 stays 0 because of romanMap index 0)
                 displayName = displayName.replace(/^(\d+)/, (match) => romanMap[parseInt(match, 10)] || match);
 
