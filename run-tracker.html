@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Run Tracker</title>
+    <link rel="icon" type="image/png" href="https://static.wikia.nocookie.net/one-more-night-official/images/9/9b/Empty-HandedIcon.png/revision/latest?cb=20250219191405">
+    <style>
+        :root {
+            color-scheme: dark !important;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #e0e0e0;
+            --text-muted: #888888;
+            --accent: #4CAF50;
+            --border: #333333;
+            --danger: #d32f2f;
+            --danger-hover: #b71c1c;
+            --progress-bg: #333;
+            --gold: #ffd700;
+            --purple: #a333c8;
+            --threat-color: hsl(30, 100%, 50%);
+            --generic-color: hsl(190, 100%, 50%);
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0 20px 20px 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-top: 20px;
+            position: sticky;
+            top: 0;
+            background: var(--bg-color);
+            z-index: 30;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            color: var(--text-main);
+            border-bottom: 3px solid var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: none;
+            margin: 0;
+            flex-direction: column;
+            gap: 2rem;
+            padding-bottom: 40px;
+            box-sizing: border-box;
+        }
+
+        .header-controls {
+            position: sticky;
+            top: 65px;
+            background-color: var(--bg-color);
+            z-index: 10;
+            padding: 10px 0 20px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .top-row { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .search-wrapper { position: relative; flex-grow: 1; min-width: 250px; display: flex; align-items: center; }
+        
+        .search-input {
+            width: 100%; padding: 14px 45px 14px 18px; background: var(--card-bg);
+            border: 1px solid var(--border); border-radius: 10px; color: var(--text-main);
+            font-size: 1rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2); }
+        
+        .clear-search {
+            position: absolute; right: 15px; background: none; border: none; color: var(--text-muted);
+            font-size: 1.2rem; cursor: pointer; display: none; padding: 0; width: auto; height: auto;
+        }
+
+        .category-filters { display: flex; gap: 10px; flex-wrap: wrap; }
+        
+        .filter-pill {
+            padding: 8px 16px; background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 20px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);
+            cursor: pointer; transition: all 0.2s; user-select: none; display: flex; gap: 6px;
+        }
+        .filter-pill .remaining-count { opacity: 0.6; font-weight: 400; }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+            50% { box-shadow: 0 0 15px var(--glow-color); border-color: var(--border-color, inherit); }
+            100% { box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        }
+
+        .filter-pill#filter-item-generics.active { border-color: var(--accent); color: var(--accent); background: rgba(76, 175, 80, 0.1); }
+        .filter-pill#filter-item-tarots.active { border-color: var(--gold); color: var(--gold); background: rgba(255, 215, 0, 0.1); }
+        .filter-pill#filter-item-wofs.active { border-color: var(--purple); color: var(--purple); background: rgba(163, 51, 200, 0.1); }
+        
+        .filter-pill#filter-penalty-generics.active { border-color: var(--generic-color); color: var(--generic-color); background: hsla(190, 100%, 50%, 0.1); }
+        .filter-pill#filter-penalty-threats.active { border-color: var(--threat-color); color: var(--threat-color); background: hsla(30, 100%, 50%, 0.1); }
+
+        .filter-pill.complete#filter-item-generics { animation: pulseGlow 3s infinite ease-in-out; --glow-color: rgba(76, 175, 80, 0.4); --border-color: var(--accent); color: var(--accent) !important; background: rgba(76, 175, 80, 0.05) !important; }
+        .filter-pill.complete#filter-item-tarots { animation: pulseGlow 3s infinite ease-in-out; --glow-color: rgba(255, 215, 0, 0.4); --border-color: var(--gold); color: var(--gold) !important; background: rgba(255, 215, 0, 0.05) !important; }
+        .filter-pill.complete#filter-item-wofs { animation: pulseGlow 3s infinite ease-in-out; --glow-color: rgba(163, 51, 200, 0.4); --border-color: var(--purple); color: var(--purple) !important; background: rgba(163, 51, 200, 0.05) !important; }
+
+        .filter-pill.complete#filter-penalty-generics { animation: pulseGlow 3s infinite ease-in-out; --glow-color: hsla(190, 100%, 50%, 0.4); --border-color: var(--generic-color); color: var(--generic-color) !important; background: hsla(190, 100%, 50%, 0.05) !important; }
+        .filter-pill.complete#filter-penalty-threats { animation: pulseGlow 3s infinite ease-in-out; --glow-color: hsla(30, 100%, 50%, 0.4); --border-color: var(--threat-color); color: var(--threat-color) !important; background: hsla(30, 100%, 50%, 0.05) !important; }
+
+        .toggle-completed-container {
+            display: flex; align-items: center; gap: 8px; background: var(--card-bg);
+            padding: 0 15px; height: 46px; border-radius: 10px; border: 1px solid var(--border);
+            cursor: pointer; user-select: none; white-space: nowrap; font-size: 0.9rem;
+            color: var(--text-muted); transition: border-color 0.2s;
+        }
+        .toggle-completed-container.active { border-color: var(--accent); color: var(--text-main); }
+
+        .stats-bar { background: var(--card-bg); padding: 15px; border-radius: 10px; border: 1px solid var(--border); }
+        .stats-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.9rem; font-weight: bold; }
+        .progress-container { width: 100%; height: 10px; background: var(--progress-bg); border-radius: 5px; overflow: hidden; }
+        .progress-fill { width: 0%; height: 100%; background: var(--accent); transition: width 0.4s ease, background-color 0.4s ease; }
+
+        .section-header {
+            display: flex; align-items: center; border-bottom: 2px solid var(--border);
+            margin-bottom: 1rem; cursor: pointer; user-select: none; gap: 20px;
+            padding: 10px 15px; border-radius: 8px 8px 0 0; transition: background-color 0.4s ease, border-color 0.4s ease;
+        }
+        .section-header h1 { border-bottom: none; margin: 0; font-size: 1.5rem; white-space: nowrap; }
+
+        .section-header.mastery-item-generics { background-color: rgba(76, 175, 80, 0.08); border-color: var(--accent); }
+        .section-header.mastery-item-tarots { background-color: rgba(255, 215, 0, 0.08); border-color: var(--gold); }
+        .section-header.mastery-item-wofs { background-color: rgba(163, 51, 200, 0.1); border-color: var(--purple); }
+        .section-header.mastery-penalty-generics { background-color: hsla(190, 100%, 50%, 0.08); border-color: var(--generic-color); }
+        .section-header.mastery-penalty-threats { background-color: hsla(30, 100%, 50%, 0.08); border-color: var(--threat-color); }
+
+        .section-progress-wrapper { flex-grow: 1; max-width: 300px; display: flex; flex-direction: column; gap: 4px; }
+        .section-progress-text { font-size: 0.7rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
+        .section-progress-container { width: 100%; height: 6px; background: var(--progress-bg); border-radius: 3px; overflow: hidden; }
+        .section-progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.4s ease, background-color 0.4s ease; opacity: 0.8; }
+        
+        .toggle-btn { background: none; border: none; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; width: auto; height: auto; padding: 5px 10px; font-weight: bold; cursor: pointer; }
+
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; padding: 0 5px; }
+        .grid-container.collapsed { display: none !important; }
+
+        .row {
+            display: flex; flex-direction: column; background: var(--card-bg); padding: 12px 15px;
+            border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.3s, opacity 0.3s, filter 0.3s; position: relative;
+            height: 105px; box-sizing: border-box; justify-content: space-between; cursor: pointer;
+        }
+        .row:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.4); }
+
+        .row.excluded {
+            opacity: 0.4;
+            filter: grayscale(100%);
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 2px 4px rgba(0,0,0,0.2) !important;
+            border-color: #444 !important;
+            pointer-events: none;
+            background-color: #1a1a1a !important;
+            animation: none !important;
+        }
+        
+        .row.excluded .item-name { color: #777 !important; }
+        .row.excluded .checkmark { visibility: hidden !important; }
+        .row.excluded .item-bar-fill { background-color: #444 !important; }
+
+        #item-generics .row.done { border-color: var(--accent); --glow-color: rgba(76, 175, 80, 0.4); animation: pulseGlow 3s infinite ease-in-out; background-color: #182818; }
+        #item-tarots .row.done { border-color: var(--gold); --glow-color: rgba(255, 215, 0, 0.35); animation: pulseGlow 3s infinite ease-in-out; background-color: #282418; }
+        #item-wofs .row.done { border-color: var(--purple); --glow-color: rgba(163, 51, 200, 0.4); animation: pulseGlow 3s infinite ease-in-out; background-color: #241828; }
+        #penalty-generics .row.done { border-color: var(--generic-color); --glow-color: hsla(190, 100%, 50%, 0.4); animation: pulseGlow 3s infinite ease-in-out; background-color: hsla(190, 100%, 8%, 1); }
+        #penalty-threats .row.done { border-color: var(--threat-color); --glow-color: hsla(30, 100%, 50%, 0.4); animation: pulseGlow 3s infinite ease-in-out; background-color: hsla(30, 100%, 8%, 1); }
+
+        .row-content { display: flex; align-items: center; width: 100%; flex-grow: 1; overflow: hidden; }
+
+        .image-column {
+            display: flex; justify-content: center; align-items: center; width: 50px; height: 50px;
+            flex-shrink: 0; margin-right: 15px; border-radius: 4px; background: #2a2a2a; overflow: hidden;
+        }
+        .image-column img { width: 100%; height: 100%; object-fit: contain; }
+        .placeholder-img { color: #777; font-size: 10px; text-align: center; }
+
+        .item-info { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; justify-content: center; height: 100%; }
+        .item-name { font-weight: 600; font-size: 0.95rem; white-space: normal; word-wrap: break-word; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+        #item-generics .row.done .item-name { color: var(--accent); }
+        #item-tarots .row.done .item-name { color: var(--gold); }
+        #item-wofs .row.done .item-name { color: #d084e8; }
+        #penalty-generics .row.done .item-name { color: var(--generic-color); }
+        #penalty-threats .row.done .item-name { color: var(--threat-color); }
+
+        .weight { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+
+        .controls { display: flex; align-items: center; gap: 8px; margin-left: 10px; flex-shrink: 0; }
+        button.btn-ctrl {
+            background-color: #2a2a2a; border: 1px solid #444; color: var(--text-main); border-radius: 4px;
+            width: 28px; height: 28px; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+        }
+        button.btn-ctrl:hover { background-color: #3a3a3a; }
+        .counter-text { font-weight: bold; min-width: 35px; text-align: center; font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+
+        .checkmark { visibility: hidden; opacity: 0; font-weight: bold; font-size: 1.1rem; margin-left: 2px; width: 18px; text-align: center; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .row.done .checkmark { visibility: visible; opacity: 1; }
+        
+        #item-generics .row.done .checkmark { color: var(--accent); }
+        #item-tarots .row.done .checkmark { color: var(--gold); }
+        #item-wofs .row.done .checkmark { color: var(--purple); }
+        #penalty-generics .row.done .checkmark { color: var(--generic-color); }
+        #penalty-threats .row.done .checkmark { color: var(--threat-color); }
+
+        .item-bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; margin-top: 4px; flex-shrink: 0; position: relative; }
+        .item-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.3s ease, background-color 0.3s ease; position: relative; overflow: hidden; }
+
+        @keyframes barSparkle { 0% { left: -100%; } 100% { left: 200%; } }
+        .item-bar-fill.sparkle::after { content: ''; position: absolute; top: 0; left: -100%; width: 80px; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent); animation: barSparkle 2.5s infinite linear; }
+
+        .reset-section { display: flex; justify-content: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+        .reset-btn { background-color: var(--danger); color: white; border: none; border-radius: 6px; padding: 10px 20px; font-size: 1rem; font-weight: bold; width: auto; height: auto; cursor: pointer; }
+        .reset-btn:hover { background-color: var(--danger-hover); }
+
+    </style>
+
+    <script id="item-generic-data" type="application/json">{"BloxyCola":{"image":"https://static.wikitide.net/onemorenightwiki/f/fb/BloxyCola.webp","weight":110,"cap":4},"PowerSavingMode":{"image":"https://static.wikitide.net/onemorenightwiki/1/1c/PowerSavingMode.webp","weight":"???","cap":2},"TarotCloth":{"image":"https://static.wikitide.net/onemorenightwiki/7/7b/TarotCloth.webp","weight":"???","cap":1},"TarotDeck":{"image":"https://static.wikitide.net/onemorenightwiki/d/d3/TarotDeck2.jpg","weight":10,"cap":2},"IncreasedPower":{"image":"https://static.wikitide.net/onemorenightwiki/4/45/IncreasedPower.webp","weight":80,"cap":7},"QuicklyOut":{"image":"https://static.wikitide.net/onemorenightwiki/b/b2/QuicklyOut.webp","weight":50,"cap":3},"BetterFlashlights":{"image":"https://static.wikitide.net/onemorenightwiki/d/db/BetterFlashlight.webp","weight":90,"cap":3},"MoreOptions":{"image":"https://static.wikitide.net/onemorenightwiki/9/99/MoreOptions.webp","weight":90,"cap":2},"Dumbell":{"image":"https://static.wikitide.net/onemorenightwiki/0/02/Dumbell.webp","weight":75,"cap":3},"GlassPillar":{"image":"https://static.wikitide.net/onemorenightwiki/a/a9/GlassPillar.webp","weight":75,"cap":1},"PolishedGenerator":{"image":"https://static.wikitide.net/onemorenightwiki/8/80/PolishedGenerator.webp","weight":"???","cap":3},"TurboMode":{"image":"https://static.wikitide.net/onemorenightwiki/2/23/TurboMode.webp","weight":20,"cap":1},"RiggingKit":{"image":"https://static.wikitide.net/onemorenightwiki/a/a1/RiggingKit.jpg","weight":45,"cap":1},"BrokenStopwatch":{"image":"https://static.wikitide.net/onemorenightwiki/b/b4/BrokenStopwatch.webp","weight":15,"cap":1},"SupplyAndDemand":{"image":"https://static.wikitide.net/onemorenightwiki/c/c0/SupplyAndDemand.jpg","weight":10,"cap":1},"BrokenDeal":{"image":"https://static.wikitide.net/onemorenightwiki/5/53/BrokenDeal.jpg","weight":25,"cap":1},"FlowerPot":{"image":"https://static.wikitide.net/onemorenightwiki/6/68/FlowerPot.jpg","weight":15,"cap":1},"ToughAsNails":{"image":"https://static.wikitide.net/onemorenightwiki/2/29/ToughAsNails.jpg","weight":20,"cap":1},"GlitchedCard":{"image":"https://static.wikitide.net/onemorenightwiki/d/de/GlitchedCard2.jpg","weight":3,"cap":1},"PhotoAlbum":{"image":"https://static.wikitide.net/onemorenightwiki/4/4c/PhotoAlbum.jpg","weight":15,"cap":2},"NinjaBelt":{"image":"https://static.wikia.nocookie.net/one-more-night-official/images/5/59/NinjaBelt.png/revision/latest?cb=20251224084522","weight":20,"cap":1},"LastRobloxianStanding":{"image":"https://static.wikia.nocookie.net/one-more-night-official/images/a/a2/LRS_Upgrade.png/revision/latest?cb=20251224084447","weight":25,"cap":1}}</script>
+    <script id="item-tarot-data" type="application/json">{"0-TheFool":{"image":"https://static.wikitide.net/onemorenightwiki/c/c0/KonoCard.png","weight":15,"cap":2},"1-TheMagician":{"image":"https://static.wikitide.net/onemorenightwiki/d/d3/RoxieCard.png","weight":5,"cap":2},"3-TheEmpress":{"image":"https://static.wikitide.net/onemorenightwiki/d/d9/DestroymanCard.png","weight":2,"cap":1},"4-TheEmperor":{"image":"https://static.wikitide.net/onemorenightwiki/7/7e/MikepikeCard.png","weight":4,"cap":1},"5-TheHierophant":{"image":"https://static.wikitide.net/onemorenightwiki/0/0c/DryCard.png","weight":10,"cap":2},"6?-TheLinked":{"image":"https://static.wikitide.net/onemorenightwiki/a/ac/LinkedCard.png","weight":7,"cap":2},"7-TheChariot":{"image":"https://static.wikitide.net/onemorenightwiki/f/f9/OliCard.png","weight":3,"cap":1},"8-Strength":{"image":"https://static.wikitide.net/onemorenightwiki/7/74/StormCard.png","weight":7,"cap":1},"9-TheHermit":{"image":"https://static.wikitide.net/onemorenightwiki/9/92/IsraCard.png","weight":7,"cap":2},"10-WheelOfFortune":{"image":"https://static.wikitide.net/onemorenightwiki/6/63/WOFCard.png","weight":"13 (+40 if bought before)","cap":1},"11-Justice":{"image":"https://static.wikitide.net/onemorenightwiki/9/97/PuppetCard.png","weight":5,"cap":1},"12?-TheOneWhoDied":{"image":"https://static.wikitide.net/onemorenightwiki/b/b4/JanCard.png","weight":8,"cap":1},"13-Death":{"image":"https://static.wikitide.net/onemorenightwiki/1/1e/FranCard.png","weight":7,"cap":1},"14-Temperance":{"image":"https://static.wikitide.net/onemorenightwiki/5/51/UpliftCard.png","weight":7,"cap":1},"15-TheDevil":{"image":"https://static.wikitide.net/onemorenightwiki/5/58/RaptorCard.png","weight":10,"cap":1},"16-TheTower":{"image":"https://static.wikitide.net/onemorenightwiki/f/fd/BadCard.png","weight":10,"cap":1},"17-TheStar":{"image":"https://static.wikitide.net/onemorenightwiki/a/a7/JordiCard.png","weight":12,"cap":1},"18-TheMoon":{"image":"https://static.wikitide.net/onemorenightwiki/9/92/MangoCard.png","weight":5,"cap":1},"19-TheSun":{"image":"https://static.wikitide.net/onemorenightwiki/9/96/WormcaveCard.png","weight":9,"cap":1},"20-Judgement":{"image":"https://static.wikitide.net/onemorenightwiki/1/1f/MyselfCard.png","weight":6,"cap":1},"21-TheWorld":{"image":"https://static.wikitide.net/onemorenightwiki/2/2a/ZGuestoCard.png","weight":10,"cap":1}}</script>
+    <script id="item-wof-data" type="application/json">{"WOFBloxyCola":{"image":"","chance":"5%","cap":4},"WOFBloxiade":{"image":"","chance":"5%","cap":4},"WOFCoffee":{"image":"","chance":"5%","cap":4},"WOFExtraPower":{"image":"","chance":"10%","cap":7}}</script>
+
+    <script id="penalty-data" type="application/json">
+    {
+        "Balloons4Sale":{"image":"https://static.wikitide.net/onemorenightwiki/e/e5/BalloonChildrenIcon.png","cap":1},
+        "SmartestBadPlay":{"image":"https://static.wikitide.net/onemorenightwiki/b/bd/Bad%27sIcon.png","cap":1},
+        "Boulder":{"image":"https://static.wikitide.net/onemorenightwiki/5/51/Ball%27sIcon.png","cap":1},
+        "ICBM":{"image":"https://static.wikitide.net/onemorenightwiki/5/51/Ball%27sIcon.png","cap":1},
+        "BeachDay":{"image":"https://static.wikitide.net/onemorenightwiki/5/51/Ball%27sIcon.png","cap":3},
+        "UpdatedPathfinding":{"image":"https://static.wikitide.net/onemorenightwiki/6/62/Barry%27sIcon.png","cap":1},
+        "SneakyBear":{"image":"https://static.wikitide.net/onemorenightwiki/6/62/Barry%27sIcon.png","cap":1},
+        "FunsySurprise":{"image":"https://static.wikitide.net/onemorenightwiki/4/48/FunsyBarry%27sIcon.png","cap":1},
+        "ArcadeFailsafe":{"image":"https://static.wikitide.net/onemorenightwiki/3/35/NewBarryIcon.png","cap":1},
+        "FacialRecognition":{"image":"https://static.wikitide.net/onemorenightwiki/e/ed/OldBarryIcon.png","cap":1},
+        "WitheredRobots":{"image":"https://static.wikitide.net/onemorenightwiki/5/54/OldAnimatronicsIcon.png","cap":2},
+        "SilentPresence":{"image":"https://static.wikitide.net/onemorenightwiki/2/2f/YellowBarryIcon.png","cap":1},
+        "ExplosiveReplacement":{"image":"https://static.wikitide.net/onemorenightwiki/4/48/BombIcon.png","cap":1},
+        "StaticStare":{"image":"https://static.wikitide.net/onemorenightwiki/0/0e/BrokenCatIcon.png","cap":1},
+        "Copycats":{"image":"https://static.wikitide.net/onemorenightwiki/4/41/Bunny%26ChickenIcon.png","cap":1},
+        "OnTour":{"image":"https://static.wikitide.net/onemorenightwiki/3/39/NewBunny%27sIcon.png","cap":1},
+        "Shackled":{"image":"https://static.wikitide.net/onemorenightwiki/1/16/ChainsIcon.png","cap":1},
+        "Chef4Hire":{"image":"https://static.wikitide.net/onemorenightwiki/3/3d/NewChicken%27sIcon.png","cap":1},
+        "CoralHeadache":{"image":"https://static.wikitide.net/onemorenightwiki/d/d4/DestroymanIII%27sIcon.png","cap":1},
+        "MathClass":{"image":"https://static.wikitide.net/onemorenightwiki/6/69/Dry%27sIcon.png","cap":1},
+        "Fox'sRushdown":{"image":"https://static.wikitide.net/onemorenightwiki/7/7a/Fox%27sIcon.png","cap":1},
+        "SharpHook":{"image":"https://static.wikitide.net/onemorenightwiki/8/82/OldFox%27sIcon.png","cap":1},
+        "Fran'sTenacity":{"image":"https://static.wikitide.net/onemorenightwiki/f/fc/Fran%27sIcon.png","cap":1},
+        "DoNotHesitate":{"image":"https://static.wikitide.net/onemorenightwiki/1/13/HesitationIcon.png","cap":1},
+        "Chicken't":{"image":"https://static.wikitide.net/onemorenightwiki/6/67/Isra%27sIcon.png","cap":1},
+        "HeavyCleaningSupplies":{"image":"https://static.wikitide.net/onemorenightwiki/3/34/Jan%27sIcon.png","cap":1},
+        "SharkTeeth":{"image":"https://static.wikitide.net/onemorenightwiki/3/36/JawsIcon.png","cap":1},
+        "JordiDoorCamper":{"image":"https://static.wikitide.net/onemorenightwiki/6/67/Jordi%27sIcon.png","cap":1},
+        "Jordi'sPerseverance":{"image":"https://static.wikitide.net/onemorenightwiki/6/67/Jordi%27sIcon.png","cap":1},
+        "OneMoreKonoling":{"image":"https://static.wikitide.net/onemorenightwiki/1/13/Kono%27sIcon.png","cap":1},
+        "Plushie-Camo":{"image":"https://static.wikitide.net/onemorenightwiki/1/13/Kono%27sIcon.png","cap":1},
+        "CertifiedWindowTapper":{"image":"https://static.wikitide.net/onemorenightwiki/f/f9/Mango%27sIcon.png","cap":1},
+        "DormantSplinter":{"image":"https://static.wikitide.net/onemorenightwiki/f/fa/MikePike%27sIcon.png","cap":1},
+        "PartyNoob":{"image":"https://static.wikitide.net/onemorenightwiki/e/ed/Noob%27sIcon.png","cap":1},
+        "Bell":{"image":"https://static.wikitide.net/onemorenightwiki/5/58/Pillar%27sIcon.png","cap":1},
+        "ReducedPolygonsPillar":{"image":"https://static.wikitide.net/onemorenightwiki/5/58/Pillar%27sIcon.png","cap":1},
+        "ToasterVent":{"image":"https://static.wikitide.net/onemorenightwiki/6/63/Pot0s%27Icon.png","cap":1},
+        "RustyCrank":{"image":"https://static.wikitide.net/onemorenightwiki/b/b9/Puppet%27sIcon.png","cap":1},
+        "MetalFumo":{"image":"https://static.wikitide.net/onemorenightwiki/6/61/Roxie%27sIcon.png","cap":1},
+        "A60":{"image":"https://static.wikitide.net/onemorenightwiki/2/2e/Rush%27sIcon.png","cap":1},
+        "Ambush":{"image":"https://static.wikitide.net/onemorenightwiki/2/2e/Rush%27sIcon.png","cap":1},
+        "FlyingPest":{"image":"https://static.wikitide.net/onemorenightwiki/3/3d/Screech%27sIcon.png","cap":1},
+        "CutTheStrings":{"image":"https://static.wikitide.net/onemorenightwiki/6/6c/StringsIcon.png","cap":1},
+        "FaultySystems":{"image":"https://static.wikitide.net/onemorenightwiki/1/1c/VentilationErrors%27Icon.png","cap":1},
+        "Voided":{"image":"https://static.wikitide.net/onemorenightwiki/3/35/VoidIcon.png","cap":1},
+        "Wormcave'sDeception":{"image":"https://static.wikitide.net/onemorenightwiki/1/16/Wormcave%27sIcon.png","cap":1},
+        "ZGuesto'sTactics":{"image":"https://static.wikitide.net/onemorenightwiki/b/b9/ZGuesto%27s_Icon.png","cap":1},
+        "RedRebound":{"image":"https://static.wikitide.net/onemorenightwiki/f/ff/Zuffy%27sIcon.png","cap":1},
+        "Heatstroke":{"image":"https://static.wikitide.net/onemorenightwiki/b/bb/NewHeatIcon.png","cap":1},
+        "CrossedWires":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/b/ba/CrossedWires.webp/64px-CrossedWires.webp.png","cap":1},
+        "NoThoughts,HeadEmpty":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/0/09/NoThoughtsHeadEmpty.png/64px-NoThoughtsHeadEmpty.png","cap":1},
+        "TiredLegs":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/7/73/TiredLegs.webp/64px-TiredLegs.webp.png","cap":3},
+        "SavoryRing":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/b/b6/SavoryRing.png/64px-SavoryRing.png","cap":1},
+        "Claustrophobia":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/f/fa/Claustrophobia.webp/64px-Claustrophobia.webp.png","cap":2},
+        "BurntBatteries":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/2/2e/BurntBatteries.webp/64px-BurntBatteries.webp.png","cap":2},
+        "Overtime":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/d/d5/Overtime.webp/64px-Overtime.webp.png","cap":3}
+    }
+    </script>
+</head>
+<body>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-target="items" onclick="switchTab('items')">Items</button>
+        <button class="tab-btn" data-target="penalties" onclick="switchTab('penalties')">Penalties</button>
+    </div>
+
+    <main id="tab-items" class="tab-content dashboard active">
+        <div class="header-controls">
+            <div class="top-row">
+                <div class="search-wrapper">
+                    <input type="text" id="itemSearch" class="search-input" placeholder="Search for items or cards..." oninput="filterItems()">
+                    <button class="clear-search" id="clearBtnItems" onclick="clearItemSearch()">✕</button>
+                </div>
+                
+                <div class="category-filters">
+                    <div id="filter-item-generics" class="filter-pill active" onclick="toggleItemCategoryVisibility('item-generics')">
+                        <span>Generic</span> <span class="remaining-count" id="rem-item-generics">(0 left)</span>
+                    </div>
+                    <div id="filter-item-tarots" class="filter-pill active" onclick="toggleItemCategoryVisibility('item-tarots')">
+                        <span>Tarot</span> <span class="remaining-count" id="rem-item-tarots">(0 left)</span>
+                    </div>
+                    <div id="filter-item-wofs" class="filter-pill active" onclick="toggleItemCategoryVisibility('item-wofs')">
+                        <span>W.O.F.</span> <span class="remaining-count" id="rem-item-wofs">(0 left)</span>
+                    </div>
+                </div>
+
+                <label class="toggle-completed-container" id="itemHideCompletedWrapper">
+                    <input type="checkbox" id="itemHideCompletedCb" onchange="filterItems()" style="display:none">
+                    <span>Hide Completed</span>
+                </label>
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stats-info">
+                    <span>Completion Progress</span>
+                    <span id="itemCompletionText">0 / 0 items (0%)</span>
+                </div>
+                <div class="progress-container">
+                    <div id="itemProgressFill" class="progress-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <section id="section-item-generics">
+            <div class="section-header" onclick="toggleItemSection('item-generics')">
+                <h1>Generic Items</h1>
+                <div class="section-progress-wrapper">
+                    <div class="section-progress-text" id="stats-text-item-generics">0%</div>
+                    <div class="section-progress-container">
+                        <div class="section-progress-fill" id="stats-fill-item-generics"></div>
+                    </div>
+                </div>
+                <button class="toggle-btn" id="btn-item-generics">Collapse</button>
+            </div>
+            <div id="item-generics" class="grid-container"></div>
+        </section>
+
+        <section id="section-item-tarots">
+            <div class="section-header" onclick="toggleItemSection('item-tarots')">
+                <h1>Tarot Cards</h1>
+                <div class="section-progress-wrapper">
+                    <div class="section-progress-text" id="stats-text-item-tarots">0%</div>
+                    <div class="section-progress-container">
+                        <div class="section-progress-fill" id="stats-fill-item-tarots"></div>
+                    </div>
+                </div>
+                <button class="toggle-btn" id="btn-item-tarots">Collapse</button>
+            </div>
+            <div id="item-tarots" class="grid-container"></div>
+        </section>
+
+        <section id="section-item-wofs">
+            <div class="section-header" onclick="toggleItemSection('item-wofs')">
+                <h1>Wheel of Fortune</h1>
+                <div class="section-progress-wrapper">
+                    <div class="section-progress-text" id="stats-text-item-wofs">0%</div>
+                    <div class="section-progress-container">
+                        <div class="section-progress-fill" id="stats-fill-item-wofs"></div>
+                    </div>
+                </div>
+                <button class="toggle-btn" id="btn-item-wofs">Collapse</button>
+            </div>
+            <div id="item-wofs" class="grid-container"></div>
+        </section>
+
+        <section class="reset-section">
+            <button class="reset-btn" onclick="resetAllItems()">Reset Item Progress</button>
+        </section>
+    </main>
+
+    <main id="tab-penalties" class="tab-content dashboard">
+        <div class="header-controls">
+            <div class="top-row">
+                <div class="search-wrapper">
+                    <input type="text" id="penSearch" class="search-input" placeholder="Search penalties..." oninput="filterPenalties()">
+                    <button class="clear-search" id="clearBtnPenalties" onclick="clearPenaltySearch()">✕</button>
+                </div>
+                
+                <div class="category-filters">
+                    <div id="filter-penalty-generics" class="filter-pill active" onclick="togglePenaltyCategoryVisibility('penalty-generics')">
+                        <span>Generic</span> <span class="remaining-count" id="rem-penalty-generics">(0 left)</span>
+                    </div>
+                    <div id="filter-penalty-threats" class="filter-pill active" onclick="togglePenaltyCategoryVisibility('penalty-threats')">
+                        <span>Threat</span> <span class="remaining-count" id="rem-penalty-threats">(0 left)</span>
+                    </div>
+                </div>
+
+                <label class="toggle-completed-container" id="penHideCompletedWrapper">
+                    <input type="checkbox" id="penHideCompletedCb" onchange="filterPenalties()" style="display:none">
+                    <span>Hide Completed</span>
+                </label>
+
+                <label class="toggle-completed-container" id="excludeHeatstrokeWrapper">
+                    <input type="checkbox" id="excludeHeatstrokeCb" onchange="toggleHeatstroke()" style="display:none">
+                    <span>Exclude Heatstroke</span>
+                </label>
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stats-info">
+                    <span>Overall Progress</span>
+                    <span id="penCompletionText">0 / 0 penalties (0%)</span>
+                </div>
+                <div class="progress-container">
+                    <div id="penProgressFill" class="progress-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <section id="section-penalty-generics">
+            <div class="section-header" onclick="togglePenaltySection('penalty-generics')">
+                <h1>Generic Penalties</h1>
+                <div class="section-progress-wrapper">
+                    <div class="section-progress-text" id="stats-text-penalty-generics">0%</div>
+                    <div class="section-progress-container">
+                        <div class="section-progress-fill" id="stats-fill-penalty-generics"></div>
+                    </div>
+                </div>
+                <button class="toggle-btn" id="btn-penalty-generics">Collapse</button>
+            </div>
+            <div id="penalty-generics" class="grid-container"></div>
+        </section>
+
+        <section id="section-penalty-threats">
+            <div class="section-header" onclick="togglePenaltySection('penalty-threats')">
+                <h1>Threat Penalties</h1>
+                <div class="section-progress-wrapper">
+                    <div class="section-progress-text" id="stats-text-penalty-threats">0%</div>
+                    <div class="section-progress-container">
+                        <div class="section-progress-fill" id="stats-fill-penalty-threats"></div>
+                    </div>
+                </div>
+                <button class="toggle-btn" id="btn-penalty-threats">Collapse</button>
+            </div>
+            <div id="penalty-threats" class="grid-container"></div>
+        </section>
+
+        <section class="reset-section">
+            <button class="reset-btn" onclick="resetAllPenalties()">Reset Penalty Progress</button>
+        </section>
+    </main>
+
+    <script>
+        function escapeId(id) { return id; }
+        
+        function getProgressColor(percent) { 
+            return `hsl(${(percent / 100) * 120}, 70%, 45%)`; 
+        }
+
+        function getPenaltyProgressColor(percent) {
+            return `hsl(${360 - ((percent / 100) * 75)}, 70%, 45%)`;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            document.querySelector(`.tab-btn[data-target="${tabName}"]`).classList.add('active');
+            
+            localStorage.setItem('runTrackerActiveTab', tabName);
+        }
+
+        const romanMap = ["0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI"];
+
+        const itemCounts = JSON.parse(localStorage.getItem("itemTrackerCounts")) || {};
+        const itemCollapsedStates = JSON.parse(localStorage.getItem("itemTrackerCollapsed")) || {};
+        const itemActiveCats = JSON.parse(localStorage.getItem("itemTrackerActiveCats")) || {'item-generics': true, 'item-tarots': true, 'item-wofs': true};
+        const itemHideCompleted = JSON.parse(localStorage.getItem("itemTrackerHideCompleted")) || false;
+        
+        const itemCategoryMap = { 'item-generics': [], 'item-tarots': [], 'item-wofs': [] };
+        const itemCaps = {};
+
+        function renderItemCategory(scriptId, containerId) {
+            const data = JSON.parse(document.getElementById(scriptId).textContent);
+            const container = document.getElementById(containerId);
+
+            for (const [itemId, item] of Object.entries(data)) {
+                itemCounts[itemId] = Math.min(item.cap, itemCounts[itemId] || 0);
+                itemCaps[itemId] = item.cap;
+                itemCategoryMap[containerId].push(itemId);
+
+                const safeId = escapeId(itemId);
+                const imageContent = item.image 
+                    ? `<img src="${item.image}" alt="icon" loading="lazy" onerror="this.src='https://via.placeholder.com/50?text=?'">` 
+                    : ``;
+
+                let displayName = itemId.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
+                if (displayName.startsWith("WOF ")) displayName = displayName.replace("WOF ", "");
+                
+                displayName = displayName.replace(/^(\d+)/, (match) => romanMap[parseInt(match, 10)] || match);
+                displayName = displayName.replace(/\s*-\s*/, ' - ').trim();
+                displayName = displayName.replace(/\b(And|As|Of|The|Who|Died)\b/g, (m) => m.toLowerCase());
+                displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+                displayName = displayName.replace(/-\s*([a-z])/, (m, p1) => '- ' + p1.toUpperCase());
+
+                const statLabel = item.chance !== undefined ? `Chance: ${item.chance}` : `Weight: ${item.weight}`;
+                const percent = (itemCounts[itemId] / item.cap) * 100;
+                const isDone = itemCounts[itemId] === item.cap ? "done" : "";
+                const sparkleClass = itemCounts[itemId] === item.cap ? "sparkle" : "";
+                const safeTitle = displayName.replace(/"/g, '&quot;');
+
+                const row = document.createElement("div");
+                row.className = `row ${isDone}`;
+                row.id = `row-${itemId}`;
+                row.setAttribute('data-id', safeId);
+                row.setAttribute('onclick', `updateItem(1, ${item.cap}, this.getAttribute('data-id'), event)`);
+
+                row.innerHTML = `
+                    <div class="row-content">
+                        <div class="image-column">${imageContent}</div>
+                        <div class="item-info">
+                            <div class="item-name" title="${safeTitle}">${displayName}</div>
+                            <div class="weight">${statLabel}</div>
+                        </div>
+                        <div class="controls">
+                            <button class="btn-ctrl" data-id="${safeId}" onclick="updateItem(-1, ${item.cap}, this.getAttribute('data-id'), event)">-</button>
+                            <div class="counter-text"><span id="${safeId}Counter">${itemCounts[itemId]}</span> / ${item.cap}</div>
+                            <button class="btn-ctrl" data-id="${safeId}" onclick="updateItem(1, ${item.cap}, this.getAttribute('data-id'), event)">+</button>
+                            <div class="checkmark">✓</div>
+                        </div>
+                    </div>
+                    <div class="item-bar-container">
+                        <div id="${safeId}Bar" class="item-bar-fill ${sparkleClass}" style="width: ${percent}%; background-color: ${getProgressColor(percent)}"></div>
+                    </div>
+                `;
+                container.appendChild(row);
+            }
+        }
+
+        function toggleItemSection(containerId) {
+            const container = document.getElementById(containerId);
+            const btn = document.getElementById('btn-' + containerId);
+            const isCollapsed = container.classList.toggle('collapsed');
+            btn.textContent = isCollapsed ? 'Expand' : 'Collapse';
+            itemCollapsedStates[containerId] = isCollapsed;
+            localStorage.setItem("itemTrackerCollapsed", JSON.stringify(itemCollapsedStates));
+        }
+
+        function toggleItemCategoryVisibility(id) {
+            itemActiveCats[id] = !itemActiveCats[id];
+            localStorage.setItem("itemTrackerActiveCats", JSON.stringify(itemActiveCats));
+            applyItemVisibilityStates();
+        }
+
+        function applyItemVisibilityStates() {
+            for (const [id, active] of Object.entries(itemActiveCats)) {
+                const section = document.getElementById(`section-${id}`);
+                const pill = document.getElementById(`filter-${id}`);
+                if (section) section.style.display = active ? 'block' : 'none';
+                if (pill) active ? pill.classList.add('active') : pill.classList.remove('active');
+            }
+            filterItems();
+        }
+
+        function updateItemStats() {
+            let totalPossibleAll = 0, currentAll = 0;
+            for (const [catId, itemIds] of Object.entries(itemCategoryMap)) {
+                let catPossible = 0, catCurrent = 0;
+                itemIds.forEach(id => { catPossible += (itemCaps[id] || 0); catCurrent += (itemCounts[id] || 0); });
+                totalPossibleAll += catPossible; currentAll += catCurrent;
+                
+                const catPercent = catPossible > 0 ? Math.round((catCurrent / catPossible) * 100) : 0;
+                const catRemaining = catPossible - catCurrent;
+                const pill = document.getElementById(`filter-${catId}`);
+                const header = document.querySelector(`#section-${catId} .section-header`);
+                
+                const textElem = document.getElementById(`stats-text-${catId}`);
+                const fillElem = document.getElementById(`stats-fill-${catId}`);
+                const remElem = document.getElementById(`rem-${catId}`);
+                
+                if(textElem) textElem.textContent = `${catPercent}%`;
+                
+                if (catRemaining === 0 && catPossible > 0) {
+                    if(remElem) remElem.textContent = `(MAX)`;
+                    if(pill) pill.classList.add('complete');
+                    if(header) header.classList.add(`mastery-${catId}`);
+                } else {
+                    if(remElem) remElem.textContent = `(${catRemaining} left)`;
+                    if(pill) pill.classList.remove('complete');
+                    if(header) header.classList.remove(`mastery-${catId}`);
+                }
+
+                if(fillElem) {
+                    fillElem.style.width = `${catPercent}%`;
+                    fillElem.style.backgroundColor = getProgressColor(catPercent);
+                }
+            }
+            const totalPercent = totalPossibleAll > 0 ? Math.round((currentAll / totalPossibleAll) * 100) : 0;
+            const compText = document.getElementById('itemCompletionText');
+            const mainFill = document.getElementById('itemProgressFill');
+            
+            if(compText) compText.textContent = `${currentAll} / ${totalPossibleAll} items (${totalPercent}%)`;
+            if(mainFill) {
+                mainFill.style.width = totalPercent + '%';
+                mainFill.style.backgroundColor = getProgressColor(totalPercent);
+            }
+        }
+
+        function clearItemSearch() {
+            const searchInput = document.getElementById('itemSearch');
+            searchInput.value = '';
+            filterItems();
+            searchInput.focus();
+        }
+
+        function filterItems() {
+            const query = document.getElementById('itemSearch').value.toLowerCase();
+            const hideDone = document.getElementById('itemHideCompletedCb').checked;
+            const clearBtn = document.getElementById('clearBtnItems');
+            if(clearBtn) clearBtn.style.display = query.length > 0 ? 'block' : 'none';
+
+            localStorage.setItem("itemTrackerHideCompleted", JSON.stringify(hideDone));
+            const wrapper = document.getElementById('itemHideCompletedWrapper');
+            if(wrapper) hideDone ? wrapper.classList.add('active') : wrapper.classList.remove('active');
+
+            document.querySelectorAll('#tab-items .row').forEach(row => {
+                const name = row.querySelector('.item-name').textContent.toLowerCase();
+                const isDone = row.classList.contains('done');
+                const shouldBeVisible = name.includes(query) && (!hideDone || !isDone);
+                row.style.display = shouldBeVisible ? 'flex' : 'none';
+            });
+
+            ['item-generics', 'item-tarots', 'item-wofs'].forEach(id => {
+                const section = document.getElementById(`section-${id}`);
+                if (!itemActiveCats[id]) return; 
+                const visibleRows = document.getElementById(id).querySelectorAll(`.row[style="display: flex;"], .row:not([style])`);
+                if(section) section.style.display = visibleRows.length > 0 ? 'block' : 'none';
+                if (query !== "" && visibleRows.length > 0) {
+                    const container = document.getElementById(id);
+                    const btn = document.getElementById('btn-' + id);
+                    if(container) container.classList.remove('collapsed');
+                    if(btn) btn.textContent = 'Collapse';
+                }
+            });
+        }
+
+        function updateItem(delta, cap, itemId, event) {
+            if (event) event.stopPropagation();
+            itemCounts[itemId] = Math.min(cap, Math.max(0, (itemCounts[itemId] || 0) + delta));
+            const rowElement = document.getElementById(`row-${itemId}`);
+            const percent = (itemCounts[itemId] / cap) * 100;
+            const safeId = escapeId(itemId);
+            const counter = document.getElementById(`${safeId}Counter`);
+            const bar = document.getElementById(`${safeId}Bar`);
+            
+            if(counter) counter.textContent = itemCounts[itemId];
+            if(bar) {
+                bar.style.width = percent + '%';
+                bar.style.backgroundColor = getProgressColor(percent);
+                itemCounts[itemId] === cap ? bar.classList.add("sparkle") : bar.classList.remove("sparkle");
+            }
+            if(rowElement) itemCounts[itemId] === cap ? rowElement.classList.add("done") : rowElement.classList.remove("done");
+            
+            localStorage.setItem("itemTrackerCounts", JSON.stringify(itemCounts));
+            filterItems();
+            updateItemStats();
+        }
+
+        function resetAllItems() {
+            if (!confirm("Reset all item progress?")) return;
+            for (const itemId in itemCounts) {
+                itemCounts[itemId] = 0;
+                const row = document.getElementById(`row-${itemId}`);
+                const safeId = escapeId(itemId);
+                const bar = document.getElementById(`${safeId}Bar`);
+                const counter = document.getElementById(`${safeId}Counter`);
+                if(counter) counter.textContent = 0;
+                if(bar) { 
+                    bar.style.width = '0%'; 
+                    bar.style.backgroundColor = getProgressColor(0); 
+                    bar.classList.remove("sparkle");
+                }
+                if(row) row.classList.remove("done");
+            }
+            localStorage.removeItem("itemTrackerCounts");
+            filterItems();
+            updateItemStats();
+        }
+
+        const penCounts = JSON.parse(localStorage.getItem("penaltyTrackerCounts")) || {};
+        const penCollapsedStates = JSON.parse(localStorage.getItem("penaltyTrackerCollapsed")) || {};
+        const penActiveCats = JSON.parse(localStorage.getItem("penaltyTrackerActiveCats")) || {'penalty-generics': true, 'penalty-threats': true};
+        const penHideCompleted = JSON.parse(localStorage.getItem("penaltyTrackerHideCompleted")) || false;
+        let heatstrokeExcluded = JSON.parse(localStorage.getItem("penaltyTrackerExcludeHeatstroke")) || false;
+        
+        const penCategoryMap = { 'penalty-generics': [], 'penalty-threats': [] };
+        const penCaps = {};
+
+        const penNameOverrides = {
+            "Balloons4Sale": "Balloons 4 Sale",
+            "Chef4Hire": "Chef 4 Hire",
+            "ZGuesto'sTactics": "ZGuesto's Tactics",
+            "NoThoughts,HeadEmpty": "No Thoughts, Head Empty",
+            "JordiDoorCamper": "Jordi \"Door Camper\"",
+            "CutTheStrings": "Cut the Strings"
+        };
+
+        function renderPenaltyCategories() {
+            const data = JSON.parse(document.getElementById('penalty-data').textContent);
+            const keys = Object.keys(data);
+            const splitIndex = keys.length - 7;
+
+            keys.forEach((itemId, index) => {
+                const item = data[itemId];
+                const containerId = index < splitIndex ? 'penalty-threats' : 'penalty-generics';
+                const container = document.getElementById(containerId);
+                
+                penCounts[itemId] = Math.min(item.cap, penCounts[itemId] || 0);
+                penCaps[itemId] = item.cap;
+                penCategoryMap[containerId].push(itemId);
+
+                let displayName = penNameOverrides[itemId] || itemId.replace(/([a-z])([A-Z])/g, '$1 $2')
+                                        .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+                                        .replace(/([a-z])(['])([a-z])/ig, '$1$2$3');
+
+                let displayCount = penCounts[itemId];
+                let percent = (displayCount / item.cap) * 100;
+                let isDone = displayCount === item.cap ? "done" : "";
+                let sparkleClass = displayCount === item.cap ? "sparkle" : "";
+                
+                if (itemId === 'Heatstroke' && heatstrokeExcluded) {
+                    displayCount = 0;
+                    percent = 0;
+                    isDone = "";
+                    sparkleClass = "";
+                }
+
+                const safeTitle = displayName.replace(/"/g, '&quot;');
+                const safeId = escapeId(itemId);
+
+                const row = document.createElement("div");
+                row.className = `row ${isDone}`;
+                if (itemId === 'Heatstroke' && heatstrokeExcluded) {
+                    row.classList.add('excluded');
+                }
+                row.id = `row-${itemId}`;
+                row.setAttribute('data-id', safeId); 
+                row.setAttribute('onclick', `updatePen(1, ${item.cap}, this.getAttribute('data-id'), event)`);
+
+                row.innerHTML = `
+                    <div class="row-content">
+                        <div class="image-column">
+                            <img src="${item.image}" alt="icon" loading="lazy" onerror="this.src='https://via.placeholder.com/50?text=?'">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-name" title="${safeTitle}">${displayName}</div>
+                        </div>
+                        <div class="controls">
+                            <button class="btn-ctrl" data-id="${safeId}" onclick="updatePen(-1, ${item.cap}, this.getAttribute('data-id'), event)">-</button>
+                            <div class="counter-text"><span id="${safeId}Counter">${displayCount}</span> / ${item.cap}</div>
+                            <button class="btn-ctrl" data-id="${safeId}" onclick="updatePen(1, ${item.cap}, this.getAttribute('data-id'), event)">+</button>
+                            <div class="checkmark">✓</div>
+                        </div>
+                    </div>
+                    <div class="item-bar-container">
+                        <div id="${safeId}Bar" class="item-bar-fill ${sparkleClass}" style="width: ${percent}%; background-color: ${getPenaltyProgressColor(percent)};"></div>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function toggleHeatstroke() {
+            heatstrokeExcluded = document.getElementById('excludeHeatstrokeCb').checked;
+            localStorage.setItem("penaltyTrackerExcludeHeatstroke", JSON.stringify(heatstrokeExcluded));
+            const wrapper = document.getElementById('excludeHeatstrokeWrapper');
+            if (wrapper) heatstrokeExcluded ? wrapper.classList.add('active') : wrapper.classList.remove('active');
+            
+            const hsRow = document.getElementById('row-Heatstroke');
+            if (hsRow) {
+                const counter = document.getElementById('HeatstrokeCounter');
+                const bar = document.getElementById('HeatstrokeBar');
+                const itemCap = penCaps['Heatstroke'] || 1;
+                const realCount = penCounts['Heatstroke'] || 0;
+
+                if (heatstrokeExcluded) {
+                    hsRow.classList.add('excluded');
+                    if (counter) counter.textContent = 0;
+                    if (bar) {
+                        bar.style.width = '0%';
+                        bar.style.backgroundColor = getPenaltyProgressColor(0);
+                        bar.classList.remove('sparkle');
+                    }
+                    hsRow.classList.remove('done');
+                } else {
+                    hsRow.classList.remove('excluded');
+                    if (counter) counter.textContent = realCount;
+                    if (bar) {
+                        const percent = (realCount / itemCap) * 100;
+                        bar.style.width = percent + '%';
+                        bar.style.backgroundColor = getPenaltyProgressColor(percent);
+                        if (realCount === itemCap) bar.classList.add('sparkle');
+                        else bar.classList.remove('sparkle');
+                    }
+                    if (realCount === itemCap) hsRow.classList.add('done');
+                    else hsRow.classList.remove('done');
+                }
+            }
+            updatePenaltyStats();
+            filterPenalties();
+        }
+
+        function togglePenaltySection(containerId) {
+            const container = document.getElementById(containerId);
+            const btn = document.getElementById('btn-' + containerId);
+            const isCollapsed = container.classList.toggle('collapsed');
+            if(btn) btn.textContent = isCollapsed ? 'Expand' : 'Collapse';
+            penCollapsedStates[containerId] = isCollapsed;
+            localStorage.setItem("penaltyTrackerCollapsed", JSON.stringify(penCollapsedStates));
+        }
+
+        function togglePenaltyCategoryVisibility(id) {
+            penActiveCats[id] = !penActiveCats[id];
+            localStorage.setItem("penaltyTrackerActiveCats", JSON.stringify(penActiveCats));
+            applyPenaltyVisibilityStates();
+        }
+
+        function applyPenaltyVisibilityStates() {
+            for (const [id, active] of Object.entries(penActiveCats)) {
+                const section = document.getElementById(`section-${id}`);
+                const pill = document.getElementById(`filter-${id}`);
+                if (section) section.style.display = active ? 'block' : 'none';
+                if (pill) active ? pill.classList.add('active') : pill.classList.remove('active');
+            }
+            filterPenalties();
+        }
+
+        function updatePenaltyStats() {
+            let totalPossibleAll = 0, currentAll = 0;
+            for (const [catId, itemIds] of Object.entries(penCategoryMap)) {
+                let catPossible = 0, catCurrent = 0;
+                itemIds.forEach(id => { 
+                    let cap = penCaps[id] || 0;
+                    catPossible += cap;
+                    if (id === 'Heatstroke' && heatstrokeExcluded) {
+                        catPossible -= cap; 
+                    } else {
+                        catCurrent += (penCounts[id] || 0); 
+                    }
+                });
+                totalPossibleAll += catPossible; currentAll += catCurrent;
+                
+                const catPercent = catPossible > 0 ? Math.round((catCurrent / catPossible) * 100) : 0;
+                const catRemaining = catPossible - catCurrent;
+                
+                const pill = document.getElementById(`filter-${catId}`);
+                const header = document.querySelector(`#section-${catId} .section-header`);
+                const textElem = document.getElementById(`stats-text-${catId}`);
+                const fillElem = document.getElementById(`stats-fill-${catId}`);
+                const remElem = document.getElementById(`rem-${catId}`);
+                
+                if (textElem) textElem.textContent = `${catPercent}%`;
+                
+                if (catRemaining === 0 && catPossible > 0) {
+                    if (remElem) remElem.textContent = `(MAX)`;
+                    if (pill) pill.classList.add('complete');
+                    if (header) header.classList.add(`mastery-${catId}`);
+                } else {
+                    if (remElem) remElem.textContent = `(${catRemaining} left)`;
+                    if (pill) pill.classList.remove('complete');
+                    if (header) header.classList.remove(`mastery-${catId}`);
+                }
+
+                if (fillElem) {
+                    fillElem.style.width = `${catPercent}%`;
+                    fillElem.style.backgroundColor = getPenaltyProgressColor(catPercent);
+                }
+            }
+            const totalPercent = totalPossibleAll > 0 ? Math.round((currentAll / totalPossibleAll) * 100) : 0;
+            const compText = document.getElementById('penCompletionText');
+            const mainFill = document.getElementById('penProgressFill');
+            
+            if (compText) compText.textContent = `${currentAll} / ${totalPossibleAll} penalties (${totalPercent}%)`;
+            if (mainFill) {
+                mainFill.style.width = totalPercent + '%';
+                mainFill.style.backgroundColor = getPenaltyProgressColor(totalPercent);
+            }
+        }
+
+        function clearPenaltySearch() {
+            const searchInput = document.getElementById('penSearch');
+            searchInput.value = '';
+            filterPenalties();
+            searchInput.focus();
+        }
+
+        function filterPenalties() {
+            const query = document.getElementById('penSearch').value.toLowerCase();
+            const hideDone = document.getElementById('penHideCompletedCb').checked;
+            const clearBtn = document.getElementById('clearBtnPenalties');
+            if (clearBtn) clearBtn.style.display = query.length > 0 ? 'block' : 'none';
+
+            localStorage.setItem("penaltyTrackerHideCompleted", JSON.stringify(hideDone));
+            const wrapper = document.getElementById('penHideCompletedWrapper');
+            if(wrapper) hideDone ? wrapper.classList.add('active') : wrapper.classList.remove('active');
+
+            document.querySelectorAll('#tab-penalties .row').forEach(row => {
+                const name = row.querySelector('.item-name').textContent.toLowerCase();
+                let isDone = row.classList.contains('done');
+                if (row.id === 'row-Heatstroke' && heatstrokeExcluded) isDone = true;
+                const shouldBeVisible = name.includes(query) && (!hideDone || !isDone);
+                row.style.display = shouldBeVisible ? 'flex' : 'none';
+            });
+
+            ['penalty-generics', 'penalty-threats'].forEach(id => {
+                const section = document.getElementById(`section-${id}`);
+                if (!penActiveCats[id]) return; 
+                const visibleRows = document.getElementById(id).querySelectorAll(`.row[style="display: flex;"], .row:not([style])`);
+                if (section) section.style.display = visibleRows.length > 0 ? 'block' : 'none';
+            });
+        }
+
+        function updatePen(delta, cap, itemId, event) {
+            if (event) event.stopPropagation();
+            if (itemId === 'Heatstroke' && heatstrokeExcluded) return;
+            
+            penCounts[itemId] = Math.min(cap, Math.max(0, (penCounts[itemId] || 0) + delta));
+            const rowElement = document.getElementById(`row-${itemId}`);
+            const percent = (penCounts[itemId] / cap) * 100;
+            const safeId = escapeId(itemId);
+            const counter = document.getElementById(`${safeId}Counter`);
+            const bar = document.getElementById(`${safeId}Bar`);
+            
+            if (counter) counter.textContent = penCounts[itemId];
+            if (bar) {
+                bar.style.width = percent + '%';
+                bar.style.backgroundColor = getPenaltyProgressColor(percent);
+                penCounts[itemId] === cap ? bar.classList.add("sparkle") : bar.classList.remove("sparkle");
+            }
+            if (rowElement) penCounts[itemId] === cap ? rowElement.classList.add("done") : rowElement.classList.remove("done");
+            
+            localStorage.setItem("penaltyTrackerCounts", JSON.stringify(penCounts));
+            filterPenalties();
+            updatePenaltyStats();
+        }
+
+        function resetAllPenalties() {
+            if (!confirm("Reset all penalty progress?")) return;
+            for (const itemId in penCounts) {
+                penCounts[itemId] = 0;
+                const row = document.getElementById(`row-${itemId}`);
+                const safeId = escapeId(itemId);
+                const bar = document.getElementById(`${safeId}Bar`);
+                const counter = document.getElementById(`${safeId}Counter`);
+                
+                if (itemId !== 'Heatstroke' || !heatstrokeExcluded) {
+                    if (counter) counter.textContent = 0;
+                    if (bar) { 
+                        bar.style.width = '0%'; 
+                        bar.style.backgroundColor = getPenaltyProgressColor(0);
+                        bar.classList.remove("sparkle");
+                    }
+                    if (row) row.classList.remove("done");
+                }
+            }
+            localStorage.removeItem("penaltyTrackerCounts");
+            filterPenalties();
+            updatePenaltyStats();
+        }
+
+        window.onload = () => {
+            const savedTab = localStorage.getItem('runTrackerActiveTab') || 'items';
+            switchTab(savedTab);
+
+            renderItemCategory("item-generic-data", "item-generics");
+            renderItemCategory("item-tarot-data", "item-tarots");
+            renderItemCategory("item-wof-data", "item-wofs");
+            
+            const itemCb = document.getElementById('itemHideCompletedCb');
+            if(itemCb) {
+                itemCb.checked = itemHideCompleted;
+                if(itemHideCompleted) document.getElementById('itemHideCompletedWrapper').classList.add('active');
+            }
+
+            ['item-generics', 'item-tarots', 'item-wofs'].forEach(id => {
+                if (itemCollapsedStates[id]) {
+                    const container = document.getElementById(id);
+                    const btn = document.getElementById('btn-' + id);
+                    if (container) container.classList.add('collapsed');
+                    if (btn) btn.textContent = 'Expand';
+                }
+            });
+
+            applyItemVisibilityStates();
+            updateItemStats();
+
+            renderPenaltyCategories();
+            
+            const penCb = document.getElementById('penHideCompletedCb');
+            if(penCb) {
+                penCb.checked = penHideCompleted;
+                if(penHideCompleted) document.getElementById('penHideCompletedWrapper').classList.add('active');
+            }
+            
+            const hsCb = document.getElementById('excludeHeatstrokeCb');
+            if(hsCb) {
+                hsCb.checked = heatstrokeExcluded;
+                if(heatstrokeExcluded) document.getElementById('excludeHeatstrokeWrapper').classList.add('active');
+            }
+            
+            ['penalty-generics', 'penalty-threats'].forEach(id => {
+                if (penCollapsedStates[id]) {
+                    const container = document.getElementById(id);
+                    const btn = document.getElementById('btn-' + id);
+                    if (container) container.classList.add('collapsed');
+                    if (btn) btn.textContent = 'Expand';
+                }
+            });
+
+            applyPenaltyVisibilityStates();
+            updatePenaltyStats();
+        };
+    </script>
+</body>
+</html>
