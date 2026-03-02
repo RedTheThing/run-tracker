@@ -299,6 +299,16 @@
         .row.excluded .checkmark { visibility: hidden !important; }
         .row.excluded .item-bar-fill { background-color: #444 !important; }
 
+        /* Visual cue for items locked into an "ON" state */
+        .row.locked-on .btn-ctrl {
+            opacity: 0.2;
+            cursor: not-allowed;
+            background-color: transparent;
+        }
+        .row.locked-on .checkmark {
+            color: var(--gold) !important;
+        }
+
         /* Styles applied to cards when they hit their max cap (completion) */
         #item-generics .row.done { border-color: var(--accent); --glow-color: rgba(76, 175, 80, 0.4); animation: pulseGlow 3s infinite ease-in-out; background-color: #182818; }
         #item-tarots .row.done { border-color: var(--gold); --glow-color: rgba(255, 215, 0, 0.35); animation: pulseGlow 3s infinite ease-in-out; background-color: #282418; }
@@ -394,7 +404,7 @@
 
                 <label class="toggle-completed-container" id="enableTarotClothWrapper">
                     <input type="checkbox" id="enableTarotClothCb" onchange="toggleTarotCloth()" style="display:none">
-                    <span>Enable Tarot Cloth</span>
+                    <span>Tarot Cloth (Default: ON)</span>
                 </label>
             </div>
             
@@ -570,7 +580,10 @@
         const itemCollapsedStates = JSON.parse(localStorage.getItem("itemTrackerCollapsed")) || {};
         const itemActiveCats = JSON.parse(localStorage.getItem("itemTrackerActiveCats")) || {'item-generics': true, 'item-tarots': true, 'item-wofs': true};
         const itemHideCompleted = JSON.parse(localStorage.getItem("itemTrackerHideCompleted")) || false;
-        let tarotClothEnabled = JSON.parse(localStorage.getItem("itemTrackerEnableTarotCloth")) || false;
+        
+        // Fetch saved state or default to true for new users
+        let savedTcState = localStorage.getItem("itemTrackerEnableTarotCloth");
+        let tarotClothEnabled = savedTcState !== null ? JSON.parse(savedTcState) : true;
         
         const itemCategoryMap = { 'item-generics': [], 'item-tarots': [], 'item-wofs': [] };
         const itemCaps = {};
@@ -601,19 +614,21 @@
                 let percent = (displayCount / item.cap) * 100;
                 let isDone = displayCount === item.cap ? "done" : "";
                 let sparkleClass = displayCount === item.cap ? "sparkle" : "";
+                let lockedClass = "";
 
-                // Force Tarot Cloth to appear maxed if the toggle is active
+                // Force Tarot Cloth to appear maxed and locked if the toggle is active
                 if (itemId === 'TarotCloth' && tarotClothEnabled) {
                     displayCount = item.cap;
                     percent = 100;
                     isDone = "done";
                     sparkleClass = "sparkle";
+                    lockedClass = "locked-on";
                 }
 
                 const safeTitle = displayName.replace(/"/g, '&quot;');
 
                 const row = document.createElement("div");
-                row.className = `row ${isDone}`;
+                row.className = `row ${isDone} ${lockedClass}`.trim();
                 row.id = `row-${itemId}`;
                 row.setAttribute('data-id', safeId);
                 row.setAttribute('onclick', `updateItem(1, ${item.cap}, this.getAttribute('data-id'), event)`);
@@ -686,6 +701,7 @@
                         bar.classList.add('sparkle');
                     }
                     tcRow.classList.add('done');
+                    tcRow.classList.add('locked-on');
                 } else {
                     if (counter) counter.textContent = realCount;
                     if (bar) {
@@ -697,6 +713,8 @@
                     }
                     if (realCount === itemCap) tcRow.classList.add('done');
                     else tcRow.classList.remove('done');
+                    
+                    tcRow.classList.remove('locked-on');
                 }
             }
             updateItemStats();
