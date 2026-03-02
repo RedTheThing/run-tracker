@@ -518,7 +518,8 @@
                             <b>Tips:</b><br>
                             • Click an item box to increment it.<br>
                             • Clicking a Maxed item box will decrease its count by 1.<br>
-                            • <b>Shift + Click</b> an item to instantly Max or Reset it.
+                            • <b>Shift + Click</b> an item box to instantly Max or Reset it.<br>
+                            • <b>Shift + Click</b> the <b>-</b> button to instantly Reset it.
                         </span>
                     </span>
                     <span id="itemCompletionText">0 / 0 items (0%)</span>
@@ -612,7 +613,8 @@
                             <b>Tips:</b><br>
                             • Click a penalty box to increment it.<br>
                             • Clicking a Maxed penalty box will decrease its count by 1.<br>
-                            • <b>Shift + Click</b> a penalty to instantly Max or Reset it.
+                            • <b>Shift + Click</b> a penalty box to instantly Max or Reset it.<br>
+                            • <b>Shift + Click</b> the <b>-</b> button to instantly Reset it.
                         </span>
                     </span>
                     <span id="penCompletionText">0 / 0 penalties (0%)</span>
@@ -927,8 +929,15 @@
             if (typeof tarotClothEnabled !== 'undefined' && itemId === 'TarotCloth' && tarotClothEnabled) return;
 
             let current = itemCounts[itemId] || 0;
+            
             if (event && event.shiftKey) {
-                itemCounts[itemId] = (current === cap) ? 0 : cap;
+                if (delta === -1) {
+                    itemCounts[itemId] = 0;
+                } else if (isBoxClick) {
+                    itemCounts[itemId] = (current === cap) ? 0 : cap;
+                } else {
+                    itemCounts[itemId] = Math.min(cap, Math.max(0, current + delta));
+                }
             } 
             else if (current === cap && delta > 0 && isBoxClick) {
                 itemCounts[itemId] = Math.max(0, current - 1);
@@ -1218,8 +1227,15 @@
             if (itemId === 'Heatstroke' && heatstrokeExcluded) return;
 
             let current = penCounts[itemId] || 0;
+            
             if (event && event.shiftKey) {
-                penCounts[itemId] = (current === cap) ? 0 : cap;
+                if (delta === -1) {
+                    penCounts[itemId] = 0;
+                } else if (isBoxClick) {
+                    penCounts[itemId] = (current === cap) ? 0 : cap;
+                } else {
+                    penCounts[itemId] = Math.min(cap, Math.max(0, current + delta));
+                }
             } 
             else if (current === cap && delta > 0 && isBoxClick) {
                 penCounts[itemId] = Math.max(0, current - 1);
