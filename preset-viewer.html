@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preset Viewer</title>
+    
+    <style>
+        :root {
+            color-scheme: dark !important;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #e0e0e0;
+            --text-muted: #888888;
+            --accent: #4CAF50;
+            --border: #333333;
+            --danger: #d32f2f;
+            --danger-hover: #b71c1c;
+            --threat-color: hsl(30, 100%, 50%);
+            --generic-color: hsl(190, 100%, 50%);
+            --config-color: #4da6ff;
+            --gold: #ffd700;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Header Title */
+        .page-title {
+            text-align: center;
+            margin: 0;
+            font-size: 2.2rem;
+            color: var(--text-main);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        /* Input Section */
+        .input-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .input-box {
+            width: 100%;
+            height: 150px;
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.95rem;
+            resize: vertical;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-box:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .btn-parse {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            align-self: center;
+            min-width: 200px;
+        }
+
+        .btn-parse:hover { background-color: #45a049; }
+        .btn-parse:active { transform: scale(0.98); }
+
+        /* Output Area */
+        #output {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+        }
+
+        .preset-title {
+            text-align: center;
+            color: var(--accent);
+            font-size: 2rem;
+            margin: 0;
+            padding: 10px;
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 1rem;
+            padding: 10px 15px;
+            border-radius: 8px 8px 0 0;
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+        
+        .section-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            flex-grow: 1;
+        }
+
+        /* Grid System */
+        .grid-container { 
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); 
+            gap: 15px; 
+            padding: 0 5px; 
+        }
+
+        /* Cards */
+        .row {
+            display: flex;
+            flex-direction: column;
+            background: var(--card-bg);
+            padding: 12px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            height: 90px;
+            box-sizing: border-box;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .row:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+
+        .row-content { 
+            display: flex; 
+            align-items: center; 
+            width: 100%; 
+        }
+
+        .image-column {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50px;
+            height: 50px;
+            flex-shrink: 0;
+            margin-right: 15px;
+            border-radius: 4px;
+            background: #2a2a2a;
+            overflow: hidden;
+        }
+
+        .image-column img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+        }
+
+        .item-info { 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+        }
+
+        .item-name { 
+            font-weight: 600; 
+            font-size: 0.95rem; 
+            white-space: normal; 
+            word-wrap: break-word; 
+            line-height: 1.2; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            font-variant-numeric: tabular-nums;
+            margin-left: 10px;
+            flex-shrink: 0;
+            background: #2a2a2a;
+            border: 1px solid #444;
+        }
+
+        /* Specific Badge Colors */
+        .type-threat .badge { color: var(--threat-color); border-color: hsla(30, 100%, 50%, 0.3); background: hsla(30, 100%, 50%, 0.1); }
+        .type-penalty .badge { color: var(--danger); border-color: hsla(0, 100%, 50%, 0.3); background: hsla(0, 100%, 50%, 0.1); }
+        .type-item .badge { color: var(--gold); border-color: hsla(51, 100%, 50%, 0.3); background: hsla(51, 100%, 50%, 0.1); }
+        .type-config .badge { color: var(--config-color); border-color: rgba(77, 166, 255, 0.3); background: rgba(77, 166, 255, 0.1); }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="page-title">Preset Viewer</h1>
+
+        <div class="input-section">
+            <textarea id="inputBox" class="input-box" placeholder="Paste your comma-separated preset string here... (e.g., Name=MyPreset, T_Jan=20, P_BabVoi=1)"></textarea>
+            <button class="btn-parse" id="parseBtn">Analyze Preset</button>
+        </div>
+
+        <div id="output">
+            </div>
+    </div>
+
+    <script>
+        const fallbackImage = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Crect width='50' height='50' fill='%232a2a2a'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-size='24' fill='%23777'%3E?%3C/text%3E%3C/svg%3E";
+        const configIcon = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Crect width='50' height='50' fill='%232a2a2a'/%3E%3Cpath d='M36.7,26.8l-3.3-0.5c-0.2-1.3-0.6-2.5-1.2-3.6l1.9-2.7c0.4-0.6,0.3-1.4-0.3-1.9l-2.6-2.6c-0.6-0.6-1.4-0.7-2-0.3l-2.7,1.9 c-1.1-0.6-2.3-1-3.6-1.2l-0.5-3.3C22.3,11.8,21.6,11,20.8,11h-3.6c-0.8,0-1.5,0.8-1.6,1.6l-0.5,3.3c-1.3,0.2-2.5,0.6-3.6,1.2 l-2.7-1.9c-0.6-0.4-1.4-0.3-2,0.3l-2.6,2.6c-0.6,0.6-0.7,1.4-0.3,2l1.9,2.7c-0.6,1.1-1,2.3-1.2,3.6l-3.3,0.5C10.8,27.1,10,27.8,10,28.7 v3.6c0,0.8,0.8,1.5,1.6,1.6l3.3,0.5c0.2,1.3,0.6,2.5,1.2,3.6l-1.9,2.7c-0.4,0.6-0.3,1.4,0.3,1.9l2.6,2.6c0.6,0.6,1.4,0.7,2,0.3 l2.7-1.9c1.1,0.6,2.3,1,3.6,1.2l0.5,3.3C26.1,48.2,26.8,49,27.6,49h3.6c0.8,0,1.5-0.8,1.6-1.6l0.5-3.3c1.3-0.2,2.5-0.6,3.6-1.2 l2.7,1.9c0.6,0.4,1.4,0.3,2-0.3l2.6-2.6c0.6-0.6,0.7-1.4,0.3-2l-1.9-2.7c0.6-1.1,1-2.3,1.2-3.6l3.3-0.5c0.8-0.1,1.5-0.9,1.5-1.7v-3.6 C49.2,27.8,48.5,27.1,47.7,26.8z M29,36c-3.9,0-7-3.1-7-7s3.1-7,7-7s7,3.1,7,7S32.9,36,29,36z' fill='%234da6ff'/%3E%3C/svg%3E";
+
+        function parseInput(threatsData, penaltyGenericData, penaltyThreatData, penaltySpecialData, penaltySandboxData, itemGenericData, itemTarotData, itemSandboxData) {
+            const raw = document.getElementById("inputBox").value;
+            const output = document.getElementById("output");
+            output.innerHTML = ""; // Clear previous results
+            
+            if (!raw.trim()) {
+                output.innerHTML = `<div style="text-align: center; color: var(--text-muted);">Please paste a preset string above.</div>`;
+                return;
+            }
+
+            const items = raw.split(",").map(item => item.trim()).filter(item => item !== "");
+
+            const types = { threat: [], penalty: [], item: [], config: [] };
+            let lastNameItem = "Unnamed Preset";
+
+            items.forEach(item => {
+                if (item.startsWith("Name=")) lastNameItem = item.slice("Name=".length);
+                else if (item.startsWith("T_")) types.threat.push(item.slice("T_".length));
+                else if (item.startsWith("P_")) types.penalty.push(item.slice("P_".length));
+                else if (item.startsWith("I_")) types.item.push(item.slice("I_".length));
+                else if (item.startsWith("C_")) types.config.push(item.slice("C_".length));
+            });
+
+            types.threat.sort();
+            types.penalty.sort();
+            types.item.sort();
+            types.config.sort();
+
+            output.innerHTML = `<h2 class="preset-title">${lastNameItem}</h2>`;
+
+            // --- Builder Helper ---
+            function createSection(title, dataArray, rowClass, rowBuilderFn) {
+                if (dataArray.length === 0) return;
+                
+                const section = document.createElement("section");
+                section.innerHTML = `
+                    <div class="section-header">
+                        <h1 style="color: var(--${rowClass.split('-')[1]}-color, var(--text-main))">${title}</h1>
+                        <span style="color: var(--text-muted); font-weight: bold; font-size: 0.9rem;">${dataArray.length} entries</span>
+                    </div>
+                `;
+                
+                const grid = document.createElement("div");
+                grid.className = "grid-container";
+                
+                dataArray.forEach(itemStr => {
+                    const card = document.createElement("div");
+                    card.className = `row type-${rowClass}`;
+                    card.innerHTML = rowBuilderFn(itemStr);
+                    grid.appendChild(card);
+                });
+
+                section.appendChild(grid);
+                output.appendChild(section);
+            }
+
+            // --- Maps ---
+            const threatMap = { BB: "BalloonBoy", BG: "BalloonGirl", Bab: "Baby", Bad: "Bad", Bal: "Ball", Bar: "Barry", BarFun: "FunsyBarry", BarNew: "NewBarry", BarOld: "OldBarry", BarYel: "YellowBarry", Bom: "Bomb", BroCat: "BrokenCat", BroChi: "BrokenChimp", Bun: "Bunny", BunNew: "NewBunny", BunOld: "OldBunny", Cad: "Cadence", Cha: "Chains", Chi: "Chicken", ChiNew: "NewChicken", ChiOld: "OldChicken", DesIII: "DestroymanIII", Dry: "Dry", Fig: "Figure", Fox: "Fox", FoxFun: "FunsyFox", FoxOld: "OldFox", Fra: "Fran", Gli: "Glitch", Hes: "Hesitation", Isr: "Isra", Jan: "Jan", Jaw: "Jaws", Jor: "JordiJumpscare", Kon: "Kono", Man: "Mango", Mar: "Mart", MikPik: "MikePike", MySha: "(???)", Noo: "Noob", Pil: "Pillar", Pot: "Pot0s", Pup: "Puppet", Rap: "Raptor", Rox: "Roxie", Rus: "Rush", Scr: "Screech", Str: "Strings", Tox: "Toxicity", VenErr: "VentilationErrors", Voi: "Void", Wor: "Wormcave", ZGue: "ZGuesto", Zuf: "Zuffy", Hea: "Heat" };
+            
+            const penaltyMap = { BabVoi: "Voidbound Baby", BadBacDoo: "Smartest Bad Play", BadChaSig: "When I Feel Like It", BalBou: "Boulder", BalRep: "Beach Day", BalICBM: "ICBM", BalBal: "Balloons 4 Sale", BalIncWatTim: "Resilient Twins", BarFunSur: "Funsy Surprise", BarIncWatTim: "Stubborn Barry", BarNewBut: "Arcade Failsafe", BarOldWinExp: "Facial Recognition", BarPat: "Updated Pathfinding", BarSil: "Sneaky Bear", BarYelSil: "Silent Presence", BomMin: "Explosive Replacement", BroCatBreCam: "Static Stare", BroChiIgn: "Broken Chimp Ears", BunChiGoOthDoo: "Copycats", BunChiLonWatTim: "Haunting Duo", BunNewAnyCam: "On Tour", ChaSlo: "Shackled", ChiNewFooDec: "Chef 4 Hire", DesIIIBur: "Coral Headache", DooSwa: "Crossed Wires", DryRepMat: "Math Class", FigIgn: "Not Listening", FoxOldLonTim: "Gold-Seeking Pirate", FoxOldShaHoo: "Sharp Hook", FoxRus: "Fox's Rushdown", FoxWeaLig: "Fox's Sabotage", FraRep: "Fran's Tenacity", GenHidInf: "No Thoughts, Head Empty", GliDouEff: "ERROR 264", HesDouDam: "Do not Hesitate", IsrInvChi: "Chicken't", JanLonTim: "Heavy Cleaning Supplies", JawAlwSta: "Shark Teeth", JawSloLea: "Sharp Jaws", JorLonTim: "Jordi \"Door Camper\"", JorRep: "Jordi's Perseverance", KonDouSpa: "One More Konoling", KonInv: "Plushie-Camo", ManLonWatTim: "Persistent Mango", ManRepLas: "Certified Window Tapper", MikPikDorSpl: "Dormant Splinter", NooCap: "Party Noob", NooSloGai: "Noob Time!", OldLonTim: "Withered Robots", PilBel: "Bell", PilSqu: "Reduced Polygons Pillar", PotRepLas: "Toaster Vent", PupSloWinUp: "Rusty Crank", RapLonTim: "Persistent Raptor", RoxLonTim: "Metal Fumo", RoxSne: "Sneak 100", RusA60: "A60", RusAmb: "Ambush", RusSil: "I'm Tip-Toein' Here", ScrFlyPes: "Flying Pest", StrLonTim: "Thicker Strings", StrWir: "Cut the Strings", VenErrLonFix: "Faulty Systems", VoiThiZon: "Voided", WorNoIco: "Wormcave's Deception", ZGueSilAndGue: "ZGuesto's Tactics", ZufFMNooLonWatTim: "Annoying Red", ZufReb: "Red Rebound", EquDis: "Equipment Disabler", SolDis: "Solo Changes Disabler", HeaStr: "Heatstroke", JorSha: "Jordi's Shadow", PupFSLasSta: "Her Last Stand", PupFSWir: "Marionette's Wires", PupFSAgg: "Puppet's Influence", PupFSLonWatTim: "Puppet's Stare", PupFSComDis: "Snapped Signal", PupFSSanForOutBox: "[FS] Out of Box" };
+            
+            const itemMap = { CarCha: "VII - The Chariot", CarJud: "XX - Judgement", DeaAdr: "Adrenaline", DeaHop: "Hope", DeaHun: "Hunger", DeaPow: "Powerless", Dum: "Dumbell", EquBarHat: "Barry's Top Hat", EquBomFla: "Red Flag", EquCal: "Dry's Calculator", EquFigGlo: "Figure's Glowstick", EquFumSti: "Fumo Sticker", EquGif: "Giftbox", EquIsrChi: "Isra's Chicken", EquJorPai: "Jordi's Paint Brush", EquMySha: "My own Shadow", FloPot: "Flower Pot", LasRobSta: "Last Robloxian Standing", NinBel: "Ninja Belt", PilTra: "Glass Pillar", PowGenCha: "Turbo Mode", TouAsNai: "Tough as Nails" };
+            
+            const configMap = { AIMax: "Max Threat AI", Agr: "Threat Aggression", Dor: "Door Overheat Scale Speed", Lap: "Laptop Consumption", Lght: "Light Power", Msk: "Mask Hit Points", MvR: "Run Speed", MvS: "Stamina", MvW: "Walk Speed", NDur: "Night Duration", PGen: "Power Generation", Pwr: "Power %", Rid: "Rid Timer Rate" };
+
+            // --- Builders ---
+            createSection("Threats", types.threat, "threat", (itemStr) => {
+                const [threat, AI] = itemStr.split("=");
+                const fullName = threatMap[threat];
+                const imgSrc = (threatsData[fullName] && threatsData[fullName].image) ? threatsData[fullName].image : fallbackImage;
+                
+                return `
+                    <div class="row-content">
+                        <div class="image-column">
+                            <img src="${imgSrc}" onerror="this.onerror=null; this.src=fallbackImage;">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-name">${fullName || threat}</div>
+                        </div>
+                        <div class="badge">Level ${AI}</div>
+                    </div>
+                `;
+            });
+
+            createSection("Penalties", types.penalty, "penalty", (itemStr) => {
+                const [penalty, amount] = itemStr.split("=");
+                let cleanedPenaltyKey = (penaltyMap[penalty] || penalty).replace(/\s+/g, "").replace(/"/g, "");
+                cleanedPenaltyKey = cleanedPenaltyKey === "DonotHesitate" ? "DoNotHesitate" : cleanedPenaltyKey;
+                cleanedPenaltyKey = cleanedPenaltyKey === "CuttheStrings" ? "CutTheStrings" : cleanedPenaltyKey;
+                cleanedPenaltyKey = cleanedPenaltyKey === "[FS]OutofBox" ? "[FS]OutOfBox" : cleanedPenaltyKey;
+
+                let imgSrc = fallbackImage;
+                if (penaltyGenericData[cleanedPenaltyKey]) imgSrc = penaltyGenericData[cleanedPenaltyKey].image;
+                else if (penaltyThreatData[cleanedPenaltyKey]) imgSrc = penaltyThreatData[cleanedPenaltyKey].image;
+                else if (penaltySpecialData[cleanedPenaltyKey]) imgSrc = penaltySpecialData[cleanedPenaltyKey].image;
+                else if (penaltySandboxData[cleanedPenaltyKey]) imgSrc = penaltySandboxData[cleanedPenaltyKey].image;
+
+                return `
+                    <div class="row-content">
+                        <div class="image-column">
+                            <img src="${imgSrc}" onerror="this.onerror=null; this.src=fallbackImage;">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-name">${penaltyMap[penalty] || penalty}</div>
+                        </div>
+                        <div class="badge">x${amount}</div>
+                    </div>
+                `;
+            });
+
+            createSection("Items", types.item, "item", (itemStr) => {
+                const [itemGame, amount] = itemStr.split("=");
+                let cleanedPenaltyKey = itemMap[itemGame] ? itemMap[itemGame].replace(/\s+/g, "") : null;
+                cleanedPenaltyKey = cleanedPenaltyKey === "VII-TheChariot" ? "7-TheChariot" : cleanedPenaltyKey;
+                cleanedPenaltyKey = cleanedPenaltyKey === "XX-Judgement" ? "20-Judgement" : cleanedPenaltyKey;
+                cleanedPenaltyKey = cleanedPenaltyKey === "MyownShadow" ? "MyOwnShadow" : cleanedPenaltyKey;
+                cleanedPenaltyKey = cleanedPenaltyKey === "ToughasNails" ? "ToughAsNails" : cleanedPenaltyKey;
+
+                let imgSrc = fallbackImage;
+                if (cleanedPenaltyKey && itemGenericData[cleanedPenaltyKey]) imgSrc = itemGenericData[cleanedPenaltyKey].image;
+                else if (cleanedPenaltyKey && itemTarotData[cleanedPenaltyKey]) imgSrc = itemTarotData[cleanedPenaltyKey].image;
+                else if (cleanedPenaltyKey && itemSandboxData[cleanedPenaltyKey]) imgSrc = itemSandboxData[cleanedPenaltyKey].image;
+
+                return `
+                    <div class="row-content">
+                        <div class="image-column">
+                            <img src="${imgSrc}" onerror="this.onerror=null; this.src=fallbackImage;">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-name">${itemMap[itemGame] || itemGame}</div>
+                        </div>
+                        <div class="badge">x${amount}</div>
+                    </div>
+                `;
+            });
+
+            createSection("Configuration", types.config, "config", (itemStr) => {
+                const [config, value] = itemStr.split("=");
+                let formattedValue = value;
+                
+                if (["Agr", "Dor", "Lap", "Lght", "PGen"].includes(config)) {
+                    formattedValue = `${parseFloat(value) * 100}%`;
+                } else if (config === "Pwr") {
+                    formattedValue = `${value}%`;
+                } else if (config === "NDur") {
+                    formattedValue = `${value} sec`;
+                }
+
+                return `
+                    <div class="row-content">
+                        <div class="image-column">
+                            <img src="${configIcon}">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-name">${configMap[config] || config}</div>
+                        </div>
+                        <div class="badge">${formattedValue}</div>
+                    </div>
+                `;
+            });
+        }
+
+        async function fetchJsonData(url) {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Could not load ${url}`);
+            return await response.json();
+        }
+
+        window.onload = async () => {
+            try {
+                const [threatsData, penaltyGenericData, penaltyThreatData, penaltySpecialData, penaltySandboxData, itemGenericData, itemTarotData, itemSandboxData] = await Promise.all([
+                    fetchJsonData('./threats.json'),
+                    fetchJsonData('penalty-generic-data.json'),
+                    fetchJsonData('penalty-threat-data.json'),
+                    fetchJsonData('penalty-special-data.json'),
+                    fetchJsonData('penalty-sandbox-data.json'),
+                    fetchJsonData('item-generic-data.json'),
+                    fetchJsonData('item-tarot-data.json'),
+                    fetchJsonData('item-sandbox-data.json')
+                ]);
+
+                document.getElementById("parseBtn").onclick = () => parseInput(threatsData, penaltyGenericData, penaltyThreatData, penaltySpecialData, penaltySandboxData, itemGenericData, itemTarotData, itemSandboxData);
+
+            } catch (error) {
+                console.error("Data loading failed:", error);
+                
+                document.body.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; text-align: center; padding: 20px; box-sizing: border-box; width: 100%;">
+                        <h1 style="color: var(--danger); margin-bottom: 10px;">⚠️ Data Loading Failed</h1>
+                        <p style="font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin-bottom: 30px; line-height: 1.5;">
+                            The Preset Viewer couldn't load the necessary JSON files. If you are opening this file directly from your computer (using <b>file://</b>), your browser's security settings (CORS) are blocking the data.
+                        </p>
+                        
+                        <div style="background: var(--card-bg); padding: 25px; border-radius: 10px; border: 1px solid var(--border); text-align: left; max-width: 500px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                            <h2 style="margin-top: 0; font-size: 1.2rem; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 10px;">How to fix this:</h2>
+                            <p style="font-size: 0.95rem; color: var(--text-muted);">You need to run a local web server to view this page. Here are a few quick ways:</p>
+                            <ul style="line-height: 1.8; color: var(--text-main); font-size: 0.95rem; padding-left: 20px;">
+                                <li><b>VS Code:</b> Install the "Live Server" extension and click "Go Live" at the bottom right.</li>
+                                <li><b>Python:</b> Open your terminal in this folder and run <code>python -m http.server</code></li>
+                                <li><b>Node.js:</b> Open your terminal in this folder and run <code>npx serve</code></li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+        };
+    </script>
+</body>
+</html>
