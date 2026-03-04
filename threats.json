@@ -53,5 +53,9 @@
 	"Wormcave":{"image":"./OMN Threats/Wormcave.png"},
 	"ZGuesto":{"image":"./OMN Threats/ZGuesto.png"},
 	"Zuffy":{"image":"./OMN Threats/Zuffy.png"},
-	"Heat":{"image":"./OMN Threats/Heat.png"}
+	"Heat":{"image":"./OMN Threats/Heat.png"},
+	"DivinePunishment":{"image":"./OMN Threats/DivinePunishment.png"},
+	"GoldenGun":{"image":"./OMN Threats/GoldenGun.png"},
+	"Stratosfear":{"image":"./OMN Threats/Stratosfear.png"},
+	"White":{"image":"./OMN Threats/White.png"}
 }
