@@ -303,10 +303,10 @@
             output.innerHTML = `<h2 class="preset-title">${lastNameItem}</h2>`;
 
             // Extract Max Threat AI for the progress bar calculation
-            let maxAI = 100; // Default fallback changed to 100
+            let maxAI = 20; // Default fallback
             const aiMaxConfig = types.config.find(c => c.startsWith("AIMax="));
             if (aiMaxConfig) {
-                maxAI = parseInt(aiMaxConfig.split("=")[1], 10) || 100;
+                maxAI = parseInt(aiMaxConfig.split("=")[1], 10) || 20;
             }
 
             // --- Builder Helper ---
