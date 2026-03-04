@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Preset Viewer</title>
+    <link rel="icon" type="image/png" href="./OMN Threats/Hesitation.png">
     
     <style>
         :root {
@@ -42,10 +43,11 @@
         /* Main Container */
         .container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 100%;
             display: flex;
             flex-direction: column;
             gap: 2rem;
+            box-sizing: border-box;
         }
 
         /* Header Title */
@@ -147,9 +149,9 @@
         /* Grid System */
         .grid-container { 
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); 
-            gap: 15px; 
-            padding: 0 5px; 
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); 
+            gap: 12px; 
+            padding: 0 5px;
         }
 
         /* Cards */
@@ -157,11 +159,12 @@
             display: flex;
             flex-direction: column;
             background: var(--card-bg);
-            padding: 12px 15px;
+            padding: 10px 12px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             border: 1px solid var(--border);
-            height: 105px;
+            min-height: 85px;
+            height: auto;
             box-sizing: border-box;
             justify-content: space-between;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -173,7 +176,7 @@
         }
 
         .row-content { 
-            display: flex; 
+            display: flex;
             align-items: center; 
             width: 100%; 
         }
@@ -182,45 +185,45 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             flex-shrink: 0;
-            margin-right: 15px;
+            margin-right: 12px;
             border-radius: 4px;
             background: #2a2a2a;
             overflow: hidden;
         }
 
         .image-column img { 
-            width: 100%; 
+            width: 100%;
             height: 100%; 
             object-fit: contain; 
         }
 
         .item-info { 
-            flex-grow: 1; 
+            flex-grow: 1;
             display: flex; 
             flex-direction: column; 
             overflow: hidden; 
         }
 
         .item-name { 
-            font-weight: 600; 
-            font-size: 0.95rem; 
+            font-weight: 600;
+            font-size: 0.9rem; 
             white-space: normal; 
             word-wrap: break-word; 
             line-height: 1.2; 
             display: -webkit-box; 
             -webkit-line-clamp: 2; 
             -webkit-box-orient: vertical; 
-            overflow: hidden; 
+            overflow: hidden;
         }
 
         .badge {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: bold;
             font-variant-numeric: tabular-nums;
             margin-left: 10px;
@@ -237,17 +240,17 @@
 
         /* Progress Bar Styles */
         .item-bar-container { 
-            width: 100%; 
+            width: 100%;
             height: 4px; 
             background: rgba(255,255,255,0.05); 
             border-radius: 2px; 
             overflow: hidden; 
             margin-top: 6px; 
-            flex-shrink: 0; 
+            flex-shrink: 0;
         }
         
         .item-bar-fill { 
-            height: 100%; 
+            height: 100%;
             width: 0%; 
             transition: width 0.3s ease, background-color 0.3s ease; 
         }
@@ -265,28 +268,29 @@
         </div>
 
         <div id="output">
-            </div>
+       
+        </div>
     </div>
 
     <script>
         const fallbackImage = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Crect width='50' height='50' fill='%232a2a2a'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-size='24' fill='%23777'%3E?%3C/text%3E%3C/svg%3E";
         const configIcon = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Crect width='50' height='50' fill='%232a2a2a'/%3E%3Cpath d='M36.7,26.8l-3.3-0.5c-0.2-1.3-0.6-2.5-1.2-3.6l1.9-2.7c0.4-0.6,0.3-1.4-0.3-1.9l-2.6-2.6c-0.6-0.6-1.4-0.7-2-0.3l-2.7,1.9 c-1.1-0.6-2.3-1-3.6-1.2l-0.5-3.3C22.3,11.8,21.6,11,20.8,11h-3.6c-0.8,0-1.5,0.8-1.6,1.6l-0.5,3.3c-1.3,0.2-2.5,0.6-3.6,1.2 l-2.7-1.9c-0.6-0.4-1.4-0.3-2,0.3l-2.6,2.6c-0.6,0.6-0.7,1.4-0.3,2l1.9,2.7c-0.6,1.1-1,2.3-1.2,3.6l-3.3,0.5C10.8,27.1,10,27.8,10,28.7 v3.6c0,0.8,0.8,1.5,1.6,1.6l3.3,0.5c0.2,1.3,0.6,2.5,1.2,3.6l-1.9,2.7c-0.4,0.6-0.3,1.4,0.3,1.9l2.6,2.6c0.6,0.6,1.4,0.7,2,0.3 l2.7-1.9c1.1,0.6,2.3,1,3.6,1.2l0.5,3.3C26.1,48.2,26.8,49,27.6,49h3.6c0.8,0,1.5-0.8,1.6-1.6l0.5-3.3c1.3-0.2,2.5-0.6,3.6-1.2 l2.7,1.9c0.6,0.4,1.4,0.3,2-0.3l2.6-2.6c0.6-0.6,0.7-1.4,0.3-2l-1.9-2.7c0.6-1.1,1-2.3,1.2-3.6l3.3-0.5c0.8-0.1,1.5-0.9,1.5-1.7v-3.6 C49.2,27.8,48.5,27.1,47.7,26.8z M29,36c-3.9,0-7-3.1-7-7s3.1-7,7-7s7,3.1,7,7S32.9,36,29,36z' fill='%234da6ff'/%3E%3C/svg%3E";
-
+        
         function parseInput(threatsData, penaltyGenericData, penaltyThreatData, penaltySpecialData, penaltySandboxData, itemGenericData, itemTarotData, itemSandboxData) {
             const raw = document.getElementById("inputBox").value;
             const output = document.getElementById("output");
-            output.innerHTML = ""; // Clear previous results
+            output.innerHTML = ""; 
             
             if (!raw.trim()) {
                 output.innerHTML = `<div style="text-align: center; color: var(--text-muted);">Please paste a preset string above.</div>`;
                 return;
             }
 
+            const numFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
             const items = raw.split(",").map(item => item.trim()).filter(item => item !== "");
-
             const types = { threat: [], penalty: [], item: [], config: [] };
             let lastNameItem = "Unnamed Preset";
-
+            
             items.forEach(item => {
                 if (item.startsWith("Name=")) lastNameItem = item.slice("Name=".length);
                 else if (item.startsWith("T_")) types.threat.push(item.slice("T_".length));
@@ -301,18 +305,14 @@
             types.config.sort();
 
             output.innerHTML = `<h2 class="preset-title">${lastNameItem}</h2>`;
-
-            // Extract Max Threat AI for the progress bar calculation
-            let maxAI = 20; // Default fallback
+            let maxAI = 20;
             const aiMaxConfig = types.config.find(c => c.startsWith("AIMax="));
             if (aiMaxConfig) {
                 maxAI = parseInt(aiMaxConfig.split("=")[1], 10) || 20;
             }
 
-            // --- Builder Helper ---
             function createSection(title, dataArray, rowClass, rowBuilderFn) {
                 if (dataArray.length === 0) return;
-                
                 const section = document.createElement("section");
                 section.innerHTML = `
                     <div class="section-header">
@@ -320,7 +320,6 @@
                         <span style="color: var(--text-muted); font-weight: bold; font-size: 0.9rem;">${dataArray.length} entries</span>
                     </div>
                 `;
-                
                 const grid = document.createElement("div");
                 grid.className = "grid-container";
                 
@@ -335,26 +334,27 @@
                 output.appendChild(section);
             }
 
-            // --- Maps ---
-            const threatMap = { BB: "BalloonBoy", BG: "BalloonGirl", Bab: "Baby", Bad: "Bad", Bal: "Ball", Bar: "Barry", BarFun: "FunsyBarry", BarNew: "NewBarry", BarOld: "OldBarry", BarYel: "YellowBarry", Bom: "Bomb", BroCat: "BrokenCat", BroChi: "BrokenChimp", Bun: "Bunny", BunNew: "NewBunny", BunOld: "OldBunny", Cad: "Cadence", Cha: "Chains", Chi: "Chicken", ChiNew: "NewChicken", ChiOld: "OldChicken", DesIII: "DestroymanIII", Dry: "Dry", Fig: "Figure", Fox: "Fox", FoxFun: "FunsyFox", FoxOld: "OldFox", Fra: "Fran", Gli: "Glitch", Hes: "Hesitation", Isr: "Isra", Jan: "Jan", Jaw: "Jaws", Jor: "JordiJumpscare", Kon: "Kono", Man: "Mango", Mar: "Mart", MikPik: "MikePike", MySha: "(???)", Noo: "Noob", Pil: "Pillar", Pot: "Pot0s", Pup: "Puppet", Rap: "Raptor", Rox: "Roxie", Rus: "Rush", Scr: "Screech", Str: "Strings", Tox: "Toxicity", VenErr: "VentilationErrors", Voi: "Void", Wor: "Wormcave", ZGue: "ZGuesto", Zuf: "Zuffy", Hea: "Heat" };
+            // Updated map to have proper spaces but preserve specified exceptions
+            const threatMap = { BB: "Balloon Boy", BG: "Balloon Girl", Bab: "Baby", Bad: "Bad", Bal: "Ball", Bar: "Barry", BarFun: "Funsy Barry", BarNew: "New Barry", BarOld: "Old Barry", BarYel: "Yellow Barry", Bom: "Bomb", BroCat: "Broken Cat", BroChi: "Broken Chimp", Bun: "Bunny", BunNew: "New Bunny", BunOld: "Old Bunny", Cad: "Cadence", Cha: "Chains", Chi: "Chicken", ChiNew: "New Chicken", ChiOld: "Old Chicken", DesIII: "Destroyman III", Dry: "Dry", Fig: "Figure", Fox: "Fox", FoxFun: "Funsy Fox", FoxOld: "Old Fox", Fra: "Fran", Gli: "Glitch", Hes: "Hesitation", Isr: "Isra", Jan: "Jan", Jaw: "Jaws", Jor: "Jordi \"Jumpscare\"", Kon: "Kono", Man: "Mango", Mar: "Mart", MikPik: "MikePike", MySha: "(???)", Noo: "Noob", Pil: "Pillar", Pot: "Pot0s", Pup: "Puppet", Rap: "Raptor", Rox: "Roxie", Rus: "Rush", Scr: "Screech", Str: "Strings", Tox: "Toxicity", VenErr: "Ventilation Errors", Voi: "Void", Wor: "Wormcave", ZGue: "ZGuesto", Zuf: "Zuffy", Hea: "Heat" };
             
             const penaltyMap = { BabVoi: "Voidbound Baby", BadBacDoo: "Smartest Bad Play", BadChaSig: "When I Feel Like It", BalBou: "Boulder", BalRep: "Beach Day", BalICBM: "ICBM", BalBal: "Balloons 4 Sale", BalIncWatTim: "Resilient Twins", BarFunSur: "Funsy Surprise", BarIncWatTim: "Stubborn Barry", BarNewBut: "Arcade Failsafe", BarOldWinExp: "Facial Recognition", BarPat: "Updated Pathfinding", BarSil: "Sneaky Bear", BarYelSil: "Silent Presence", BomMin: "Explosive Replacement", BroCatBreCam: "Static Stare", BroChiIgn: "Broken Chimp Ears", BunChiGoOthDoo: "Copycats", BunChiLonWatTim: "Haunting Duo", BunNewAnyCam: "On Tour", ChaSlo: "Shackled", ChiNewFooDec: "Chef 4 Hire", DesIIIBur: "Coral Headache", DooSwa: "Crossed Wires", DryRepMat: "Math Class", FigIgn: "Not Listening", FoxOldLonTim: "Gold-Seeking Pirate", FoxOldShaHoo: "Sharp Hook", FoxRus: "Fox's Rushdown", FoxWeaLig: "Fox's Sabotage", FraRep: "Fran's Tenacity", GenHidInf: "No Thoughts, Head Empty", GliDouEff: "ERROR 264", HesDouDam: "Do not Hesitate", IsrInvChi: "Chicken't", JanLonTim: "Heavy Cleaning Supplies", JawAlwSta: "Shark Teeth", JawSloLea: "Sharp Jaws", JorLonTim: "Jordi \"Door Camper\"", JorRep: "Jordi's Perseverance", KonDouSpa: "One More Konoling", KonInv: "Plushie-Camo", ManLonWatTim: "Persistent Mango", ManRepLas: "Certified Window Tapper", MikPikDorSpl: "Dormant Splinter", NooCap: "Party Noob", NooSloGai: "Noob Time!", OldLonTim: "Withered Robots", PilBel: "Bell", PilSqu: "Reduced Polygons Pillar", PotRepLas: "Toaster Vent", PupSloWinUp: "Rusty Crank", RapLonTim: "Persistent Raptor", RoxLonTim: "Metal Fumo", RoxSne: "Sneak 100", RusA60: "A60", RusAmb: "Ambush", RusSil: "I'm Tip-Toein' Here", ScrFlyPes: "Flying Pest", StrLonTim: "Thicker Strings", StrWir: "Cut the Strings", VenErrLonFix: "Faulty Systems", VoiThiZon: "Voided", WorNoIco: "Wormcave's Deception", ZGueSilAndGue: "ZGuesto's Tactics", ZufFMNooLonWatTim: "Annoying Red", ZufReb: "Red Rebound", EquDis: "Equipment Disabler", SolDis: "Solo Changes Disabler", HeaStr: "Heatstroke", JorSha: "Jordi's Shadow", PupFSLasSta: "Her Last Stand", PupFSWir: "Marionette's Wires", PupFSAgg: "Puppet's Influence", PupFSLonWatTim: "Puppet's Stare", PupFSComDis: "Snapped Signal", PupFSSanForOutBox: "[FS] Out of Box" };
-            
             const itemMap = { CarCha: "VII - The Chariot", CarJud: "XX - Judgement", DeaAdr: "Adrenaline", DeaHop: "Hope", DeaHun: "Hunger", DeaPow: "Powerless", Dum: "Dumbell", EquBarHat: "Barry's Top Hat", EquBomFla: "Red Flag", EquCal: "Dry's Calculator", EquFigGlo: "Figure's Glowstick", EquFumSti: "Fumo Sticker", EquGif: "Giftbox", EquIsrChi: "Isra's Chicken", EquJorPai: "Jordi's Paint Brush", EquMySha: "My own Shadow", FloPot: "Flower Pot", LasRobSta: "Last Robloxian Standing", NinBel: "Ninja Belt", PilTra: "Glass Pillar", PowGenCha: "Turbo Mode", TouAsNai: "Tough as Nails" };
-            
             const configMap = { AIMax: "Max Threat AI", Agr: "Threat Aggression", Dor: "Door Overheat Scale Speed", Lap: "Laptop Consumption", Lght: "Light Power", Msk: "Mask Hit Points", MvR: "Run Speed", MvS: "Stamina", MvW: "Walk Speed", NDur: "Night Duration", PGen: "Power Generation", Pwr: "Power %", Rid: "Rid Timer Rate" };
-
-            // --- Builders ---
+            
             createSection("Threats", types.threat, "threat", (itemStr) => {
                 const [threat, AI] = itemStr.split("=");
-                const aiVal = parseFloat(AI) || 0;
-                const fullName = threatMap[threat];
-                const imgSrc = (threatsData[fullName] && threatsData[fullName].image) ? threatsData[fullName].image : fallbackImage;
+                const aiVal = parseInt(AI, 10) || 0;
                 
-                // Calculate percentage (clamped 0-100) and color shift from Green (120) to Red (0)
-                // Use +().toFixed(2) to fix floating point math errors
-                const percent = +(Math.min(100, Math.max(0, (aiVal / (maxAI || 1)) * 100))).toFixed(2);
-                const barColor = `hsl(${120 - (percent / 100) * 120}, 70%, 45%)`;
+                const fullName = threatMap[threat] || threat;
+                
+                // Strip spaces and quotes out so the JSON image lookup still succeeds seamlessly 
+                const jsonKey = fullName ? fullName.replace(/[\s"]/g, "") : threat; 
+                
+                const imgSrc = (threatsData[jsonKey] && threatsData[jsonKey].image) ? threatsData[jsonKey].image : fallbackImage;
+                
+                const rawPercent = Math.min(100, Math.max(0, (aiVal / (maxAI || 1)) * 100));
+                const formattedPercent = numFormatter.format(rawPercent);
+                const barColor = `hsl(${120 - (rawPercent / 100) * 120}, 70%, 45%)`;
                 
                 return `
                     <div class="row-content">
@@ -362,12 +362,12 @@
                             <img src="${imgSrc}" onerror="this.onerror=null; this.src=fallbackImage;">
                         </div>
                         <div class="item-info">
-                            <div class="item-name">${fullName || threat}</div>
+                            <div class="item-name">${fullName}</div>
                         </div>
                         <div class="badge">${AI} AI</div>
                     </div>
                     <div class="item-bar-container">
-                        <div class="item-bar-fill" style="width: ${percent}%; background-color: ${barColor};"></div>
+                        <div class="item-bar-fill" style="width: ${formattedPercent}%; background-color: ${barColor};"></div>
                     </div>
                 `;
             });
@@ -384,7 +384,7 @@
                 else if (penaltyThreatData[cleanedPenaltyKey]) imgSrc = penaltyThreatData[cleanedPenaltyKey].image;
                 else if (penaltySpecialData[cleanedPenaltyKey]) imgSrc = penaltySpecialData[cleanedPenaltyKey].image;
                 else if (penaltySandboxData[cleanedPenaltyKey]) imgSrc = penaltySandboxData[cleanedPenaltyKey].image;
-
+                
                 return `
                     <div class="row-content">
                         <div class="image-column">
@@ -410,7 +410,7 @@
                 if (cleanedPenaltyKey && itemGenericData[cleanedPenaltyKey]) imgSrc = itemGenericData[cleanedPenaltyKey].image;
                 else if (cleanedPenaltyKey && itemTarotData[cleanedPenaltyKey]) imgSrc = itemTarotData[cleanedPenaltyKey].image;
                 else if (cleanedPenaltyKey && itemSandboxData[cleanedPenaltyKey]) imgSrc = itemSandboxData[cleanedPenaltyKey].image;
-
+                
                 return `
                     <div class="row-content">
                         <div class="image-column">
@@ -429,8 +429,7 @@
                 let formattedValue = value;
                 
                 if (["Agr", "Dor", "Lap", "Lght", "PGen"].includes(config)) {
-                    // Use +().toFixed(2) to fix floating point math errors (e.g., 0.14 * 100 = 14.000000000000002)
-                    formattedValue = `${+(parseFloat(value) * 100).toFixed(2)}%`;
+                    formattedValue = `${numFormatter.format(parseFloat(value) * 100)}%`;
                 } else if (config === "Pwr") {
                     formattedValue = `${value}%`;
                 } else if (config === "NDur") {
@@ -469,12 +468,9 @@
                     fetchJsonData('item-tarot-data.json'),
                     fetchJsonData('item-sandbox-data.json')
                 ]);
-
                 document.getElementById("parseBtn").onclick = () => parseInput(threatsData, penaltyGenericData, penaltyThreatData, penaltySpecialData, penaltySandboxData, itemGenericData, itemTarotData, itemSandboxData);
-
             } catch (error) {
                 console.error("Data loading failed:", error);
-                
                 document.body.innerHTML = `
                     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; text-align: center; padding: 20px; box-sizing: border-box; width: 100%;">
                         <h1 style="color: var(--danger); margin-bottom: 10px;">⚠️ Data Loading Failed</h1>
