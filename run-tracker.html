@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Run Tracker</title>
 	<link rel="icon" type="image/png" href="https://static.wikia.nocookie.net/one-more-night-official/images/9/9b/Empty-HandedIcon.png/revision/latest?cb=20250219191405">
-	
+
 	<style>
 		/* Define global CSS variables for easy theming and consistent colors */
 		:root {
@@ -53,17 +53,48 @@
 			background: #555;
 		}
 
+		.sticky-wrapper {
+			position: sticky;
+			top: 0;
+			z-index: 50;
+			background: var(--bg-color);
+		}
+
+		.game-stats {
+			width: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 15px;
+			padding-top: 20px;
+			background: var(--bg-color);
+		}
+
+		.SoM-select-wrapper {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		.power-stat {
+			min-width: 80px; /* prevents shifting */
+			text-align: left;
+		}
+
+		.movement-stats {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			min-width: 125px;
+			gap: 4px;
+		}
+
 		/* Tab navigation styling, made sticky to stay at the top during scroll */
 		.tabs {
 			display: flex;
 			gap: 10px;
-			margin-bottom: 20px;
 			border-bottom: 2px solid var(--border);
-			padding-top: 20px;
-			position: sticky;
-			top: 0;
 			background: var(--bg-color);
-			z-index: 30;
 		}
 
 		/* Individual tab buttons */
@@ -114,14 +145,14 @@
 		/* Sticky header for search, filters, and progress bars within each tab */
 		.header-controls {
 			position: sticky;
-			top: 65px; /* Offset to clear the sticky tabs above */
+			top: 185px;
 			background-color: var(--bg-color);
 			z-index: 10;
-			padding: 10px 0 20px 0;
+			padding: 20px 0 20px 0;
 			border-bottom: 1px solid var(--border);
 			display: flex;
 			flex-direction: column;
-			gap: 15px;
+			gap: 20px;
 		}
 
 		/* Disable sticky header-controls on mobile to save screen space */
@@ -137,7 +168,7 @@
 		/* Container for search and filter buttons */
 		.top-row { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
 		.search-wrapper { position: relative; flex-grow: 1; min-width: 250px; display: flex; align-items: center; }
-		
+
 		/* Search input styling */
 		.search-input {
 			width: 100%;
@@ -147,7 +178,7 @@
 			transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s;
 		}
 		.search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2); }
-		
+
 		/* Animation keyframes for a visual flash when search is cleared */
 		@keyframes flashEffect {
 			0% { box-shadow: 0 0 15px var(--accent); border-color: var(--accent); background-color: rgba(76, 175, 80, 0.15); }
@@ -165,7 +196,7 @@
 
 		/* Container for the category toggle pills */
 		.category-filters { display: flex; gap: 10px; flex-wrap: wrap; }
-		
+
 		/* Interactive pill buttons for filtering categories */
 		.filter-pill {
 			padding: 8px 16px; background: var(--card-bg); border: 1px solid var(--border);
@@ -186,7 +217,7 @@
 		.filter-pill#filter-item-generics.active { border-color: var(--accent); color: var(--accent); background: rgba(76, 175, 80, 0.1); }
 		.filter-pill#filter-item-tarots.active { border-color: var(--gold); color: var(--gold); background: rgba(255, 215, 0, 0.1); }
 		.filter-pill#filter-item-wofs.active { border-color: var(--purple); color: var(--purple); background: rgba(163, 51, 200, 0.1); }
-		
+
 		.filter-pill#filter-penalty-generics.active { border-color: var(--generic-color); color: var(--generic-color); background: hsla(190, 100%, 50%, 0.1); }
 		.filter-pill#filter-penalty-threats.active { border-color: var(--threat-color); color: var(--threat-color); background: hsla(30, 100%, 50%, 0.1); }
 
@@ -211,11 +242,11 @@
 		.tooltip-container {
 			position: relative; display: inline-flex; align-items: center; gap: 6px; cursor: help;
 		}
-		
+
 		.info-icon {
 			color: var(--text-muted); font-size: 1rem; transition: color 0.2s;
 		}
-		
+
 		.tooltip-container:hover .info-icon {
 			color: var(--accent);
 		}
@@ -261,7 +292,7 @@
 		.tooltip-container:hover .tooltip-text {
 			visibility: visible; opacity: 1; transform: translateY(0);
 		}
-		
+
 		/* Highlight text inside tooltip */
 		.tooltip-text b { color: var(--accent); }
 
@@ -291,7 +322,7 @@
 		.section-progress-text { font-size: 0.7rem; color: var(--text-muted); font-weight: bold; text-transform: uppercase; }
 		.section-progress-container { width: 100%; height: 6px; background: var(--progress-bg); border-radius: 3px; overflow: hidden; }
 		.section-progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.4s ease, background-color 0.4s ease; opacity: 0.8; }
-		
+
 		/* Expand/Collapse text button in section headers */
 		.toggle-btn { background: none; border: none; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; width: auto; height: auto; padding: 5px 10px; font-weight: bold; cursor: pointer; }
 
@@ -319,7 +350,7 @@
 			box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 2px 4px rgba(0,0,0,0.2) !important;
 			border-color: #444 !important; pointer-events: none; background-color: #1a1a1a !important; animation: none !important;
 		}
-		
+
 		.row.excluded .item-name { color: #777 !important; }
 		.row.excluded .checkmark { visibility: hidden !important; }
 		.row.excluded .item-bar-fill { background-color: #444 !important; }
@@ -376,7 +407,7 @@
 
 		.checkmark { visibility: hidden; opacity: 0; font-weight: bold; font-size: 1.1rem; margin-left: 2px; width: 18px; text-align: center; transition: opacity 0.3s ease, visibility 0.3s ease; }
 		.row.done .checkmark { visibility: visible; opacity: 1; }
-		
+
 		#item-generics .row.done .checkmark { color: var(--accent); }
 		#item-tarots .row.done .checkmark { color: var(--gold); }
 		#item-wofs .row.done .checkmark { color: var(--purple); }
@@ -415,35 +446,35 @@
 			display: none; justify-content: center; align-items: center;
 			opacity: 0; transition: opacity 0.2s ease;
 		}
-		
+
 		.modal-overlay.show { 
 			display: flex; 
 			opacity: 1; 
 		}
-		
+
 		.modal-box {
 			background: var(--card-bg); border: 1px solid var(--border);
 			border-radius: 10px; padding: 25px; max-width: 400px; width: 90%;
 			text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 			transform: translateY(-20px); transition: transform 0.2s ease;
 		}
-		
+
 		.modal-overlay.show .modal-box { 
 			transform: translateY(0); 
 		}
-		
+
 		.modal-box h2 { margin-top: 0; color: var(--text-main); }
 		.modal-box p { color: var(--text-muted); line-height: 1.5; margin-bottom: 25px; }
 		.modal-actions { display: flex; justify-content: center; gap: 15px; }
-		
+
 		.modal-btn {
 			padding: 10px 20px; border-radius: 6px; border: none; 
 			font-weight: bold; cursor: pointer; font-size: 1rem; transition: background 0.2s;
 		}
-		
+
 		.cancel-btn { background: #444; color: var(--text-main); }
 		.cancel-btn:hover { background: #555; }
-		
+
 		.confirm-btn { background: var(--danger); color: white; }
 		.confirm-btn:hover { background: var(--danger-hover); }
 
@@ -451,33 +482,55 @@
 </head>
 <body>
 
-	<div class="tabs">
-		<button class="tab-btn active" data-target="items" onclick="switchTab('items')">Items</button>
-		<button class="tab-btn" data-target="penalties" onclick="switchTab('penalties')">Penalties</button>
+	<div class="sticky-wrapper">
+		<div class="game-stats">
+			<div class="power-stat">
+				<span>Power: <strong id="powerStat">0</strong></span>
+			</div>
+			<div class="SoM-select-wrapper">
+				<select id="imageSelect" onchange="updateGameStats()">
+					<option value="https://static.wikitide.net/onemorenightwiki/thumb/5/53/GuilyStateofMind.JPG/300px-GuilyStateofMind.JPG">Guilty</option>
+					<option value="https://static.wikitide.net/onemorenightwiki/thumb/3/39/CalmStateofMind.JPG/300px-CalmStateofMind.JPG">Calm</option>
+					<option value="https://static.wikitide.net/onemorenightwiki/thumb/3/38/DevastatedStateofMind.JPG/300px-DevastatedStateofMind.JPG">Devastated</option>
+					<option value="https://static.wikitide.net/onemorenightwiki/thumb/7/76/ScorchedStateofMind.JPG/300px-ScorchedStateofMind.JPG">Scorched</option>
+					<option value="https://static.wikitide.net/onemorenightwiki/8/89/SoakedStateofMind.jpg">Soaked</option>
+					<option value="https://static.wikitide.net/onemorenightwiki/7/71/APuppet.jpg">A Puppet</option>
+					<option value="https://static.wikitide.net/onemorenightwiki/a/a1/LostStateofMind.JPG">Fooled</option>
+				</select>
+
+				<img id="previewImg" height="100px" width="100px">
+			</div>
+			<div class="movement-stats">
+				<span>Run Speed: <strong id="runStat">0</strong></span>
+				<span>Walk Speed: <strong id="walkStat">0</strong></span>
+				<span>Stamina: <strong id="staminaStat">0</strong></span>
+			</div>
+		</div>
+
+		<div class="tabs">
+			<button class="tab-btn active" data-target="items" onclick="switchTab('items')">Items</button>
+			<button class="tab-btn" data-target="penalties" onclick="switchTab('penalties')">Penalties</button>
+		</div>
 	</div>
 
 	<main id="tab-items" class="tab-content dashboard active">
 		<div class="header-controls">
 			<div class="top-row">
 				<div class="search-wrapper">
-				 
-				   <input type="text" id="itemSearch" class="search-input" placeholder="Search for items or cards..." oninput="filterItems()" onclick="clearItemSearch()">
+					<input type="text" id="itemSearch" class="search-input" placeholder="Search for items or cards..." oninput="filterItems()" onclick="clearItemSearch()">
 					<button class="clear-search" id="clearBtnItems" onclick="clearItemSearch()">✕</button>
 				</div>
-				
+
 				<div class="category-filters">
-			   
-					 <div id="filter-item-generics" class="filter-pill active" onclick="toggleItemCategoryVisibility('item-generics')">
+					<div id="filter-item-generics" class="filter-pill active" onclick="toggleItemCategoryVisibility('item-generics')">
 						<span>Generic</span> <span class="remaining-count" id="rem-item-generics">(0 left)</span>
 					</div>
 					<div id="filter-item-tarots" class="filter-pill active" onclick="toggleItemCategoryVisibility('item-tarots')">
-				   
-					 <span>Tarot</span> <span class="remaining-count" id="rem-item-tarots">(0 left)</span>
+						<span>Tarot</span> <span class="remaining-count" id="rem-item-tarots">(0 left)</span>
 					</div>
 					<div id="filter-item-wofs" class="filter-pill active" onclick="toggleItemCategoryVisibility('item-wofs')">
 						<span>W.O.F.</span> <span class="remaining-count" id="rem-item-wofs">(0 left)</span>
-				   
-				 </div>
+					</div>
 				</div>
 
 				<label class="toggle-completed-container" id="itemHideCompletedWrapper">
@@ -485,18 +538,18 @@
 					<span>Hide Completed</span>
 				</label>
 
-	
+
 				 <label class="toggle-completed-container" id="enableTarotClothWrapper">
 					<input type="checkbox" id="enableTarotClothCb" onchange="toggleTarotCloth()" style="display:none">
 					<span>Force Tarot Cloth</span>
 				</label>
 			</div>
-			
+
 			<div class="stats-bar">
 				<div class="stats-info">
 					<span class="tooltip-container">
 						Completion Progress <span class="info-icon">ⓘ</span>
-					  
+
 						<span class="tooltip-text">
 							<b>Tips:</b><br>
 							• Click an item box to increment it.<br>
@@ -518,13 +571,11 @@
 			<div class="section-header" onclick="toggleItemSection('item-generics')">
 				<h1>Generic Items</h1>
 				<div class="section-progress-wrapper">
-	   
-					 <div class="section-progress-text" id="stats-text-item-generics">0%</div>
+					<div class="section-progress-text" id="stats-text-item-generics">0%</div>
 					<div class="section-progress-container">
 						<div class="section-progress-fill" id="stats-fill-item-generics"></div>
 					</div>
 				</div>
-  
 				<button class="toggle-btn" id="btn-item-generics">Collapse</button>
 			</div>
 			<div id="item-generics" class="grid-container"></div>
@@ -533,13 +584,11 @@
 		<section id="section-item-tarots">
 			<div class="section-header" onclick="toggleItemSection('item-tarots')">
 				<h1>Tarot Cards</h1>
-		  
 				<div class="section-progress-wrapper">
 					<div class="section-progress-text" id="stats-text-item-tarots">0%</div>
 					<div class="section-progress-container">
 						<div class="section-progress-fill" id="stats-fill-item-tarots"></div>
 					</div>
-	
 				</div>
 				<button class="toggle-btn" id="btn-item-tarots">Collapse</button>
 			</div>
@@ -548,13 +597,13 @@
 
 		<section id="section-item-wofs">
 			<div class="section-header" onclick="toggleItemSection('item-wofs')">
-			 
+
 				 <h1>Wheel of Fortune</h1>
 				<div class="section-progress-wrapper">
 					<div class="section-progress-text" id="stats-text-item-wofs">0%</div>
 					<div class="section-progress-container">
 						<div class="section-progress-fill" id="stats-fill-item-wofs"></div>
-		 
+
 					</div>
 				</div>
 				<button class="toggle-btn" id="btn-item-wofs">Collapse</button>
@@ -572,25 +621,25 @@
 			<div class="top-row">
 				<div class="search-wrapper">
 					<input type="text" id="penSearch" class="search-input" placeholder="Search penalties..." oninput="filterPenalties()" onclick="clearPenaltySearch()">
-		   
+
 					 <button class="clear-search" id="clearBtnPenalties" onclick="clearPenaltySearch()">✕</button>
 				</div>
-				
+
 				<div class="category-filters">
 					<div id="filter-penalty-generics" class="filter-pill active" onclick="togglePenaltyCategoryVisibility('penalty-generics')">
-			   
+
 						 <span>Generic</span> <span class="remaining-count" id="rem-penalty-generics">(0 left)</span>
 					</div>
 					<div id="filter-penalty-threats" class="filter-pill active" onclick="togglePenaltyCategoryVisibility('penalty-threats')">
 						<span>Threat</span> <span class="remaining-count" id="rem-penalty-threats">(0 left)</span>
-			   
+
 					 </div>
 				</div>
 
 				<label class="toggle-completed-container" id="penHideCompletedWrapper">
 					<input type="checkbox" id="penHideCompletedCb" onchange="togglePenHideCompleted()" style="display:none">
 					<span>Hide Completed</span>
-				
+
 				</label>
 
 				<label class="toggle-completed-container" id="excludeHeatstrokeWrapper">
@@ -598,12 +647,12 @@
 					<span>Exclude Heatstroke</span>
 				</label>
 			</div>
-		 
+
 			<div class="stats-bar">
 				<div class="stats-info">
 					<span class="tooltip-container">
 						Completion Progress <span class="info-icon">ⓘ</span>
-				   
+
 					 <span class="tooltip-text">
 							<b>Tips:</b><br>
 							• Click a penalty box to increment it.<br>
@@ -625,13 +674,13 @@
 			<div class="section-header" onclick="togglePenaltySection('penalty-generics')">
 				<h1>Generic Penalties</h1>
 				<div class="section-progress-wrapper">
-	   
+
 					 <div class="section-progress-text" id="stats-text-penalty-generics">0%</div>
 					<div class="section-progress-container">
 						<div class="section-progress-fill" id="stats-fill-penalty-generics"></div>
 					</div>
 				</div>
-  
+
 				<button class="toggle-btn" id="btn-penalty-generics">Collapse</button>
 			</div>
 			<div id="penalty-generics" class="grid-container"></div>
@@ -640,13 +689,13 @@
 		<section id="section-penalty-threats">
 			<div class="section-header" onclick="togglePenaltySection('penalty-threats')">
 				<h1>Threat Penalties</h1>
-		  
+
 				<div class="section-progress-wrapper">
 					<div class="section-progress-text" id="stats-text-penalty-threats">0%</div>
 					<div class="section-progress-container">
 						<div class="section-progress-fill" id="stats-fill-penalty-threats"></div>
 					</div>
-	
+
 				</div>
 				<button class="toggle-btn" id="btn-penalty-threats">Collapse</button>
 			</div>
@@ -656,7 +705,7 @@
 		<section class="reset-section">
 			<button class="reset-btn" onclick="showResetModal('penalties')">Reset Penalty Progress</button>
 		</section>
-   
+
 	</main>
 
 	<div id="custom-modal-overlay" class="modal-overlay">
@@ -672,7 +721,7 @@
 
 	<script>
 		function escapeId(id) { return id; }
-		
+
 		function getProgressColor(percent) { 
 			return `hsl(${(percent / 100) * 120}, 70%, 45%)`;
 		}
@@ -682,8 +731,18 @@
 			return `hsl(${120 - ((percent / 100) * 120)}, 70%, 45%)`;
 		}
 
+		const SoMStats = {
+			"Guilty":		{ power: 100, run: 16, walk: 10, stamina: 2 },
+			"Calm":			{ power: 75 },
+			"Devastated":	{ power: 110, run: 17, walk: 11, stamina: 2.5 },
+			"Scorched":		{ power: 110, run: 15, walk: 12 },
+			"Soaked":		{ power: 105 },
+			"A Puppet":		{ power: 105 },
+			"Fooled":		{ power: 25, run: 14, walk: 8, stamina: 1 }
+		};
+
 		const romanMap = ["0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI"];
-		
+
 		const nameOverrides = {
 			"Balloons4Sale": "Balloons 4 Sale",
 			"Chef4Hire": "Chef 4 Hire",
@@ -703,7 +762,7 @@
 			// 2. Insert spaces before capital letters AND numbers
 			let name = id.replace(/([a-z])([A-Z0-9])/g, '$1 $2')
 						 .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
-						 
+
 			// 3. Handle apostrophes (fixes things like "ZGuesto ' s" getting split)
 			name = name.replace(/([a-z])\s*(['])\s*([a-z])/ig, '$1$2$3');
 
@@ -739,16 +798,16 @@
 				itemActiveCats: JSON.parse(localStorage.getItem("itemTrackerActiveCats")) || {'item-generics': true, 'item-tarots': true, 'item-wofs': true},
 				itemHideCompleted: JSON.parse(localStorage.getItem("itemTrackerHideCompleted")) || false,
 				tarotClothEnabled: JSON.parse(localStorage.getItem("itemTrackerEnableTarotCloth")) ?? true,
-				
+
 				penCounts: JSON.parse(localStorage.getItem("penaltyTrackerCounts")) || {},
 				penCollapsed: JSON.parse(localStorage.getItem("penaltyTrackerCollapsed")) || {},
 				penActiveCats: JSON.parse(localStorage.getItem("penaltyTrackerActiveCats")) || {'penalty-generics': true, 'penalty-threats': true},
 				penHideCompleted: JSON.parse(localStorage.getItem("penaltyTrackerHideCompleted")) || false,
 				heatstrokeExcluded: JSON.parse(localStorage.getItem("penaltyTrackerExcludeHeatstroke")) || false,
-				
+
 				activeTab: localStorage.getItem("runTrackerActiveTab") || 'items'
 			};
-			
+
 			// Clean up the old keys so they don't clutter the browser storage
 			const oldKeys = [
 				"itemTrackerCounts", "itemTrackerCollapsed", "itemTrackerActiveCats", "itemTrackerHideCompleted", "itemTrackerEnableTarotCloth", 
@@ -756,7 +815,7 @@
 				"runTrackerActiveTab"
 			];
 			oldKeys.forEach(key => localStorage.removeItem(key));
-			
+
 			// Save the newly migrated master object
 			localStorage.setItem('runTrackerSaveData', JSON.stringify(masterSave));
 		}
@@ -787,12 +846,105 @@
 		function switchTab(tabName) {
 			document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
 			document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-			
+
 			document.getElementById(`tab-${tabName}`).classList.add('active');
 			document.querySelector(`.tab-btn[data-target="${tabName}"]`).classList.add('active');
-			
+
 			localStorage.setItem('runTrackerActiveTab', tabName);
 			saveAllData();
+		}
+
+		function updateGameStats() {
+			const select = document.getElementById("imageSelect")
+    		const selectedName = select.options[select.selectedIndex].text;
+			const img = document.getElementById("previewImg")
+
+			if (select.value) {
+				img.src = select.value
+				img.style.display = "block"
+			} else {
+				img.style.display = "none"
+			}
+
+			// Merge Guilty stats with selected SoM stats
+			let stats = {
+				...SoMStats["Guilty"],
+				...SoMStats[selectedName]
+			};
+
+			const bloxycolas = itemCounts.BloxyCola;
+			const increasedpowers = itemCounts.IncreasedPower;
+			const thestar = itemCounts["17-TheStar"];
+			const temperancepowerincreaseds = itemCounts.TemperancePowerIncreased
+			const WOFbloxycolas = itemCounts.WOFBloxyCola;
+			const WOFbloxiades = itemCounts.WOFBloxiade;
+			const WOFcoffees = itemCounts.WOFCoffee;
+			const WOFextrapowers = itemCounts.WOFExtraPower;
+			const tiredlegs = penCounts.TiredLegs;
+			const burntbatteries = penCounts.BurntBatteries;
+
+			if (bloxycolas > 0) {
+				stats.run	  += bloxycolas * 1.25;
+				stats.walk	  += bloxycolas * 1;
+				stats.stamina += bloxycolas * 0.35;
+			}
+
+			if (increasedpowers > 0) {
+				stats.power	  += increasedpowers * 10;
+			}
+
+			if (thestar > 0) {
+				stats.power	  += thestar * 15;
+			}
+
+			if (temperancepowerincreaseds > 0) {
+				const temperanceMap = {
+					1: 10,
+					2: 15,
+					3: 18,
+					4: 20
+				};
+
+				const bonus = temperanceMap[temperancepowerincreaseds] || 0;
+				stats.power += bonus;
+			}
+
+			if (WOFbloxycolas > 0) {
+				stats.stamina += WOFbloxycolas * 0.25;
+			}
+
+			if (WOFbloxiades > 0) {
+				stats.run	  += WOFbloxiades * 0.7;
+			}
+
+			if (WOFcoffees > 0) {
+				stats.walk	  += WOFcoffees * 0.7;
+			}
+
+			if (WOFextrapowers > 0) {
+				stats.power	  += WOFextrapowers * 5;
+			}
+
+			if (tiredlegs > 0) {
+				stats.run	  -= tiredlegs * 1;
+				stats.walk	  -= tiredlegs * 1;
+				stats.stamina -= tiredlegs * 0.3;
+			}
+
+			if (burntbatteries > 0) {
+				stats.power	  -= burntbatteries * 10;
+			}
+
+			// Round to 2 decimals
+			stats.run     = Number(stats.run.toFixed(2));
+			stats.walk    = Number(stats.walk.toFixed(2));
+			stats.stamina = Number(stats.stamina.toFixed(2));
+			stats.power   = Number(stats.power.toFixed(2));
+
+			document.getElementById("powerStat").textContent = stats.power;
+			document.getElementById("runStat").textContent = stats.run;
+			document.getElementById("walkStat").textContent = stats.walk;
+			document.getElementById("staminaStat").textContent = stats.stamina;
 		}
 
 		const itemCategoryMap = { 'item-generics': [], 'item-tarots': [], 'item-wofs': [] };
@@ -808,16 +960,16 @@
 				itemCategoryMap[containerId].push(itemId);
 
 				const safeId = escapeId(itemId);
-				
+
 				// Use the provided image, or default to the offline fallback immediately
 				const imgSrc = item.image ? item.image : fallbackImage;
 				const imageContent = `<img src="${imgSrc}" alt="icon" loading="lazy" onerror="this.onerror=null; this.src=fallbackImage;">`;
-				
+
 				let displayName = formatDisplayName(itemId);
-				
+
 				const statLabel = item.chance !== undefined ?
 				`Chance: ${item.chance}` : `Weight: ${item.weight}`;
-				
+
 				let displayCount = itemCounts[itemId];
 				let percent = (displayCount / item.cap) * 100;
 				let isDone = displayCount === item.cap ? "done" : "";
@@ -888,20 +1040,20 @@
 			}
 			filterItems();
 		}
-		
+
 		function toggleTarotCloth() {
 			tarotClothEnabled = document.getElementById('enableTarotClothCb').checked;
 			saveAllData();
 			const wrapper = document.getElementById('enableTarotClothWrapper');
 			if (wrapper) tarotClothEnabled ? wrapper.classList.add('active') : wrapper.classList.remove('active');
-			
+
 			const tcRow = document.getElementById('row-TarotCloth');
 			if (tcRow) {
 				const counter = document.getElementById('TarotClothCounter');
 				const bar = document.getElementById('TarotClothBar');
 				const itemCap = itemCaps['TarotCloth'] || 1;
 				const realCount = itemCounts['TarotCloth'] || 0;
-				
+
 				const btnMinus = document.getElementById(`btn-minus-TarotCloth`);
 				const btnPlus = document.getElementById(`btn-plus-TarotCloth`);
 
@@ -929,12 +1081,13 @@
 					}
 					if (realCount === itemCap) tcRow.classList.add('done');
 					else tcRow.classList.remove('done');
-					
+
 					tcRow.classList.remove('locked-on');
 				}
 			}
 			updateItemStats();
 			filterItems();
+			updateGameStats();
 		}
 
 		function updateItemStats() {
@@ -944,26 +1097,26 @@
 				itemIds.forEach(id => { 
 					let cap = itemCaps[id] || 0;
 					catPossible += cap; 
-					
+
 					if (id === 'TarotCloth' && tarotClothEnabled) {
 						catCurrent += cap; 
 					} else {
 						catCurrent += (itemCounts[id] || 0); 
 					}
 				});
-				
+
 				totalPossibleAll += catPossible; currentAll += catCurrent;
 				const catPercent = catPossible > 0 ? Math.round((catCurrent / catPossible) * 100) : 0;
 				const catRemaining = catPossible - catCurrent;
 				const pill = document.getElementById(`filter-${catId}`);
 				const header = document.querySelector(`#section-${catId} .section-header`);
-				
+
 				const textElem = document.getElementById(`stats-text-${catId}`);
 				const fillElem = document.getElementById(`stats-fill-${catId}`);
 				const remElem = document.getElementById(`rem-${catId}`);
-				
+
 				if(textElem) textElem.textContent = `${catPercent}%`;
-				
+
 				if (catRemaining === 0 && catPossible > 0) {
 					if(remElem) remElem.textContent = `(MAX)`;
 					if(pill) pill.classList.add('complete');
@@ -979,7 +1132,7 @@
 					fillElem.style.backgroundColor = getProgressColor(catPercent);
 				}
 			}
-			
+
 			const totalPercent = totalPossibleAll > 0 ? Math.round((currentAll / totalPossibleAll) * 100) : 0;
 			const compText = document.getElementById('itemCompletionText');
 			const mainFill = document.getElementById('itemProgressFill');
@@ -1012,29 +1165,29 @@
 			const query = document.getElementById('itemSearch').value.toLowerCase();
 			const hideDone = document.getElementById('itemHideCompletedCb').checked;
 			const clearBtn = document.getElementById('clearBtnItems');
-			
+
 			if(clearBtn) clearBtn.style.display = query.length > 0 ? 'block' : 'none';
 
 			const wrapper = document.getElementById('itemHideCompletedWrapper');
 			if(wrapper) hideDone ? wrapper.classList.add('active') : wrapper.classList.remove('active');
-			
+
 			document.querySelectorAll('#tab-items .row').forEach(row => {
 				const name = row.querySelector('.item-name').textContent.toLowerCase();
 				let isDone = row.classList.contains('done');
-				
+
 				if (row.id === 'row-TarotCloth' && tarotClothEnabled) isDone = true; 
-				
+
 				const shouldBeVisible = name.includes(query) && (!hideDone || !isDone);
 				row.style.display = shouldBeVisible ? 'flex' : 'none';
 			});
-			
+
 			['item-generics', 'item-tarots', 'item-wofs'].forEach(id => {
 				const section = document.getElementById(`section-${id}`);
 				if (!itemActiveCats[id]) return; 
 				const visibleRows = document.getElementById(id).querySelectorAll(`.row[style="display: flex;"], .row:not([style])`);
-				
+
 				if(section) section.style.display = visibleRows.length > 0 ? 'block' : 'none';
-				
+
 				if (query !== "" && visibleRows.length > 0) {
 					const container = document.getElementById(id);
 					const btn = document.getElementById('btn-' + id);
@@ -1044,7 +1197,7 @@
 					const container = document.getElementById(id);
 					const btn = document.getElementById('btn-' + id);
 					const isCollapsed = itemCollapsedStates[id];
-					
+
 					if (container) {
 						isCollapsed ? container.classList.add('collapsed') : container.classList.remove('collapsed');
 					}
@@ -1082,25 +1235,26 @@
 			const safeId = escapeId(itemId);
 			const counter = document.getElementById(`${safeId}Counter`);
 			const bar = document.getElementById(`${safeId}Bar`);
-			
+
 			if(counter) counter.textContent = itemCounts[itemId];
-			
+
 			const btnMinus = document.getElementById(`btn-minus-${safeId}`);
 			const btnPlus = document.getElementById(`btn-plus-${safeId}`);
 			if(btnMinus) btnMinus.disabled = (itemCounts[itemId] === 0);
 			if(btnPlus) btnPlus.disabled = (itemCounts[itemId] === cap);
-			
+
 			if(bar) {
 				bar.style.width = percent + '%';
 				bar.style.backgroundColor = getProgressColor(percent);
 				itemCounts[itemId] === cap ? bar.classList.add("sparkle") : bar.classList.remove("sparkle");
 			}
-			
+
 			if(rowElement) itemCounts[itemId] === cap ? rowElement.classList.add("done") : rowElement.classList.remove("done");
-			
+
 			saveAllData();
 			filterItems(); 
 			updateItemStats();
+			updateGameStats();
 		}
 
 		function performItemReset() {
@@ -1110,18 +1264,18 @@
 				const safeId = escapeId(itemId);
 				const bar = document.getElementById(`${safeId}Bar`);
 				const counter = document.getElementById(`${safeId}Counter`);
-				
+
 				if (typeof tarotClothEnabled !== 'undefined' && itemId === 'TarotCloth' && tarotClothEnabled) {
 					continue;
 				}
-				
+
 				if(counter) counter.textContent = 0;
-				
+
 				const btnMinus = document.getElementById(`btn-minus-${safeId}`);
 				const btnPlus = document.getElementById(`btn-plus-${safeId}`);
 				if(btnMinus) btnMinus.disabled = true;
 				if(btnPlus) btnPlus.disabled = false;
-				
+
 				if(bar) { 
 					bar.style.width = '0%';
 					bar.style.backgroundColor = getProgressColor(0); 
@@ -1129,10 +1283,11 @@
 				}
 				if(row) row.classList.remove("done");
 			}
-			
+
 			saveAllData();
 			filterItems();
 			updateItemStats();
+			updateGameStats();
 		}
 
 		// --- PENALTY STATE MANAGEMENT ---
@@ -1149,12 +1304,12 @@
 				penCategoryMap[containerId].push(itemId);
 
 				let displayName = formatDisplayName(itemId);
-				
+
 				let displayCount = penCounts[itemId];
 				let percent = (displayCount / item.cap) * 100;
 				let isDone = displayCount === item.cap ? "done" : "";
 				let sparkleClass = displayCount === item.cap ? "sparkle" : "";
-				
+
 				if (itemId === 'Heatstroke' && heatstrokeExcluded) {
 					displayCount = 0;
 					percent = 0;
@@ -1167,11 +1322,11 @@
 
 				const row = document.createElement("div");
 				row.className = `row ${isDone}`;
-			  
+
 				if (itemId === 'Heatstroke' && heatstrokeExcluded) {
 					row.classList.add('excluded');
 				}
-				
+
 				row.id = `row-${itemId}`;
 				row.setAttribute('data-id', safeId); 
 				row.setAttribute('onclick', `updatePen(1, ${item.cap}, this.getAttribute('data-id'), event, true)`);
@@ -1205,14 +1360,14 @@
 			saveAllData();
 			const wrapper = document.getElementById('excludeHeatstrokeWrapper');
 			if (wrapper) heatstrokeExcluded ? wrapper.classList.add('active') : wrapper.classList.remove('active');
-			
+
 			const hsRow = document.getElementById('row-Heatstroke');
 			if (hsRow) {
 				 const counter = document.getElementById('HeatstrokeCounter');
 				const bar = document.getElementById('HeatstrokeBar');
 				const itemCap = penCaps['Heatstroke'] || 1;
 				const realCount = penCounts['Heatstroke'] || 0;
-				
+
 				const btnMinus = document.getElementById(`btn-pen-minus-Heatstroke`);
 				const btnPlus = document.getElementById(`btn-pen-plus-Heatstroke`);
 
@@ -1245,6 +1400,7 @@
 			}
 			updatePenaltyStats();
 			filterPenalties();
+			updateGameStats();
 		}
 
 		function togglePenaltySection(containerId) {
@@ -1286,16 +1442,16 @@
 					}
 				});
 				totalPossibleAll += catPossible; currentAll += catCurrent;
-				
+
 				const catPercent = catPossible > 0 ? Math.round((catCurrent / catPossible) * 100) : 0;
 				const catRemaining = catPossible - catCurrent;
-				
+
 				const pill = document.getElementById(`filter-${catId}`);
 				const header = document.querySelector(`#section-${catId} .section-header`);
 				const textElem = document.getElementById(`stats-text-${catId}`);
 				const fillElem = document.getElementById(`stats-fill-${catId}`);
 				const remElem = document.getElementById(`rem-${catId}`);
-				
+
 				if (textElem) textElem.textContent = `${catPercent}%`;
 				if (catRemaining === 0 && catPossible > 0) {
 					if (remElem) remElem.textContent = `(MAX)`;
@@ -1312,7 +1468,7 @@
 					fillElem.style.backgroundColor = getPenaltyProgressColor(catPercent);
 				}
 			}
-			
+
 			const totalPercent = totalPossibleAll > 0 ? Math.round((currentAll / totalPossibleAll) * 100) : 0;
 			const compText = document.getElementById('penCompletionText');
 			const mainFill = document.getElementById('penProgressFill');
@@ -1345,27 +1501,27 @@
 			const query = document.getElementById('penSearch').value.toLowerCase();
 			const hideDone = document.getElementById('penHideCompletedCb').checked;
 			const clearBtn = document.getElementById('clearBtnPenalties');
-			
+
 			if (clearBtn) clearBtn.style.display = query.length > 0 ? 'block' : 'none';
-			
+
 			const wrapper = document.getElementById('penHideCompletedWrapper');
 			if(wrapper) hideDone ? wrapper.classList.add('active') : wrapper.classList.remove('active');
-			
+
 			document.querySelectorAll('#tab-penalties .row').forEach(row => {
 				const name = row.querySelector('.item-name').textContent.toLowerCase();
 				let isDone = row.classList.contains('done');
-				
+
 				if (row.id === 'row-Heatstroke' && heatstrokeExcluded) isDone = true;
-				
+
 				 const shouldBeVisible = name.includes(query) && (!hideDone || !isDone);
 				row.style.display = shouldBeVisible ? 'flex' : 'none';
 			});
-			
+
 			['penalty-generics', 'penalty-threats'].forEach(id => {
 				const section = document.getElementById(`section-${id}`);
 				if (!penActiveCats[id]) return; 
 				const visibleRows = document.getElementById(id).querySelectorAll(`.row[style="display: flex;"], .row:not([style])`);
-				
+
 				if (section) section.style.display = visibleRows.length > 0 ? 'block' : 'none';
 
 				if (query !== "" && visibleRows.length > 0) {
@@ -1377,7 +1533,7 @@
 					const container = document.getElementById(id);
 					const btn = document.getElementById('btn-' + id);
 					const isCollapsed = penCollapsedStates[id];
-					
+
 					if (container) {
 						isCollapsed ? container.classList.add('collapsed') : container.classList.remove('collapsed');
 					}
@@ -1415,24 +1571,25 @@
 			const safeId = escapeId(itemId);
 			const counter = document.getElementById(`${safeId}Counter`);
 			const bar = document.getElementById(`${safeId}Bar`);
-			
+
 			if (counter) counter.textContent = penCounts[itemId];
 
 			const btnMinus = document.getElementById(`btn-pen-minus-${safeId}`);
 			const btnPlus = document.getElementById(`btn-pen-plus-${safeId}`);
 			if(btnMinus) btnMinus.disabled = (penCounts[itemId] === 0);
 			if(btnPlus) btnPlus.disabled = (penCounts[itemId] === cap);
-			
+
 			if (bar) {
 				bar.style.width = percent + '%';
 				bar.style.backgroundColor = getPenaltyProgressColor(percent);
 				penCounts[itemId] === cap ? bar.classList.add("sparkle") : bar.classList.remove("sparkle");
 			}
 			if (rowElement) penCounts[itemId] === cap ? rowElement.classList.add("done") : rowElement.classList.remove("done");
-			
+
 			saveAllData();
 			filterPenalties();
 			updatePenaltyStats();
+			updateGameStats();
 		}
 
 		function performPenaltyReset() {
@@ -1442,18 +1599,18 @@
 				const safeId = escapeId(itemId);
 				const bar = document.getElementById(`${safeId}Bar`);
 				const counter = document.getElementById(`${safeId}Counter`);
-				
+
 				if (itemId === 'Heatstroke' && heatstrokeExcluded) {
 					continue;
 				}
-				
+
 				if (counter) counter.textContent = 0;
-				
+
 				const btnMinus = document.getElementById(`btn-pen-minus-${safeId}`);
 				const btnPlus = document.getElementById(`btn-pen-plus-${safeId}`);
 				if(btnMinus) btnMinus.disabled = true;
 				if(btnPlus) btnPlus.disabled = false;
-				
+
 				if (bar) { 
 					bar.style.width = '0%';
 					bar.style.backgroundColor = getPenaltyProgressColor(0);
@@ -1461,10 +1618,11 @@
 				}
 				if (row) row.classList.remove("done");
 			}
-			
+
 			saveAllData();
 			filterPenalties();
 			updatePenaltyStats();
+			updateGameStats();
 		}
 
 		// --- MODAL LOGIC ---
@@ -1474,7 +1632,7 @@
 			pendingResetType = type;
 			const title = document.getElementById('modal-title');
 			const message = document.getElementById('modal-message');
-			
+
 			if (type === 'items') {
 				title.textContent = "Reset Item Progress";
 				message.textContent = "Are you sure you want to reset all item progress? This cannot be undone.";
@@ -1482,7 +1640,7 @@
 				title.textContent = "Reset Penalty Progress";
 				message.textContent = "Are you sure you want to reset all penalty progress? This cannot be undone.";
 			}
-			
+
 			const overlay = document.getElementById('custom-modal-overlay');
 			overlay.style.display = 'flex';
 			setTimeout(() => overlay.classList.add('show'), 10); 
@@ -1510,7 +1668,7 @@
 				if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
 					return;
 				}
-				
+
 				e.preventDefault(); 
 
 				const activeTab = localStorage.getItem('runTrackerActiveTab') || 'items';
@@ -1542,17 +1700,17 @@
 					fetchJsonData('penalty-generic-data.json'),
 					fetchJsonData('penalty-threat-data.json')
 				]);
-				
+
 				renderItemCategory(itemGenericData, "item-generics");
 				renderItemCategory(itemTarotData, "item-tarots");
 				renderItemCategory(itemWofData, "item-wofs");
-				
+
 				const itemCb = document.getElementById('itemHideCompletedCb');
 				if(itemCb) {
 					itemCb.checked = itemHideCompleted;
 					if(itemHideCompleted) document.getElementById('itemHideCompletedWrapper').classList.add('active');
 				}
-				
+
 				const tcCb = document.getElementById('enableTarotClothCb');
 				if(tcCb) {
 					tcCb.checked = tarotClothEnabled;
@@ -1567,25 +1725,25 @@
 						if (btn) btn.textContent = 'Expand';
 					}
 				});
-				
+
 				applyItemVisibilityStates();
 				updateItemStats();
 
 				renderPenaltyCategory(penaltyGenericData, "penalty-generics");
 				renderPenaltyCategory(penaltyThreatData, "penalty-threats");
-				
+
 				const penCb = document.getElementById('penHideCompletedCb');
 				if(penCb) {
 					penCb.checked = penHideCompleted;
 					if(penHideCompleted) document.getElementById('penHideCompletedWrapper').classList.add('active');
 				}
-				
+
 				const hsCb = document.getElementById('excludeHeatstrokeCb');
 				if(hsCb) {
 					hsCb.checked = heatstrokeExcluded;
 					if(heatstrokeExcluded) document.getElementById('excludeHeatstrokeWrapper').classList.add('active');
 				}
-				
+
 				['penalty-generics', 'penalty-threats'].forEach(id => {
 					if (penCollapsedStates[id]) {
 						const container = document.getElementById(id);
@@ -1597,6 +1755,7 @@
 
 				applyPenaltyVisibilityStates();
 				updatePenaltyStats();
+				updateGameStats();
 
 			} catch (error) {
 				console.error("Data loading failed:", error);
@@ -1606,7 +1765,7 @@
 						<p style="font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin-bottom: 30px; line-height: 1.5;">
 							The tracker couldn't load the necessary JSON files. If you are opening this file directly from your computer (using <b>file://</b>), your browser's security settings (CORS) are blocking the data.
 						</p>
-						
+
 						<div style="background: var(--card-bg); padding: 25px; border-radius: 10px; border: 1px solid var(--border); text-align: left; max-width: 500px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
 							<h2 style="margin-top: 0; font-size: 1.2rem; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 10px;">How to fix this:</h2>
 							<p style="font-size: 0.95rem; color: var(--text-muted);">You need to run a local web server to view this page. Here are a few quick ways:</p>
