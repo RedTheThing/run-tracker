@@ -161,15 +161,6 @@
 			gap: 20px;
 		}
 
-		/* Disable sticky header-controls on mobile to save screen space */
-		@media (max-width: 768px) {
-			.header-controls {
-				position: relative !important;
-				top: auto !important;
-				z-index: 1;
-			}
-		}
-
 		/* Container for search and filter buttons */
 		.top-row { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
 		.search-wrapper { position: relative; flex-grow: 1; min-width: 250px; display: flex; align-items: center; }
@@ -1697,6 +1688,20 @@
 			return await response.json();
 		}
 
+		/* Move header-controls out of sticky-wrapper on mobile to save screen space */
+		function moveHeader() {
+			const header = document.querySelector('.header-controls');
+			const wrapper = document.querySelector('.sticky-wrapper');
+
+			if (window.innerWidth < 710) {
+				wrapper.after(header);
+			} else {
+				wrapper.appendChild(header);
+			}
+		}
+
+		window.onresize = moveHeader;
+
 		window.onload = async () => {
 			const savedTab = masterSave.activeTab || 'items';
 			switchTab(savedTab);
@@ -1770,6 +1775,8 @@
 				}
 
 				updateGameStats();
+
+				moveHeader();
 
 			} catch (error) {
 				console.error("Data loading failed:", error);
