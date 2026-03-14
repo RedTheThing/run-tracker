@@ -63,22 +63,31 @@
 		.game-stats {
 			width: 100%;
 			display: flex;
+			flex-direction: column;
 			align-items: center;
 			justify-content: center;
-			gap: 15px;
-			padding-top: 20px;
+			gap: 5px;
+			padding-top: 15px;
 			background: var(--bg-color);
 		}
 
-		.SoM-select-wrapper {
+		.game-stats-row {
+			width: 100%;
 			display: flex;
-			flex-direction: column;
+			flex-direction: row;
 			align-items: center;
+			justify-content: center;
+			gap: 10px;
 		}
 
 		.power-stat {
-			min-width: 80px; /* prevents shifting */
+			min-width: 80px;
 			text-align: left;
+		}
+
+		#SoM-img {
+			height: 100px;
+			width: 100px;
 		}
 
 		.movement-stats {
@@ -86,7 +95,6 @@
 			flex-direction: column;
 			align-items: flex-start;
 			min-width: 125px;
-			gap: 4px;
 		}
 
 		/* Tab navigation styling, made sticky to stay at the top during scroll */
@@ -484,11 +492,9 @@
 
 	<div class="sticky-wrapper">
 		<div class="game-stats">
-			<div class="power-stat">
-				<span>Power: <strong id="powerStat">0</strong></span>
-			</div>
-			<div class="SoM-select-wrapper">
-				<select id="imageSelect" onchange="updateGameStats()">
+			<div class="game-stats-row">
+				<div class="power-stat"></div>
+				<select id="SoM-select" onchange="updateGameStats()">
 					<option value="https://static.wikitide.net/onemorenightwiki/thumb/5/53/GuilyStateofMind.JPG/300px-GuilyStateofMind.JPG">Guilty</option>
 					<option value="https://static.wikitide.net/onemorenightwiki/thumb/3/39/CalmStateofMind.JPG/300px-CalmStateofMind.JPG">Calm</option>
 					<option value="https://static.wikitide.net/onemorenightwiki/thumb/3/38/DevastatedStateofMind.JPG/300px-DevastatedStateofMind.JPG">Devastated</option>
@@ -497,13 +503,18 @@
 					<option value="https://static.wikitide.net/onemorenightwiki/7/71/APuppet.jpg">A Puppet</option>
 					<option value="https://static.wikitide.net/onemorenightwiki/a/a1/LostStateofMind.JPG">Fooled</option>
 				</select>
-
-				<img id="previewImg" height="100px" width="100px">
+				<div class="movement-stats"></div>
 			</div>
-			<div class="movement-stats">
-				<span>Run Speed: <strong id="runStat">0</strong></span>
-				<span>Walk Speed: <strong id="walkStat">0</strong></span>
-				<span>Stamina: <strong id="staminaStat">0</strong></span>
+			<div class="game-stats-row">
+				<div class="power-stat">
+					<span>Power: <strong id="powerStat">0</strong></span>
+				</div>
+				<img id="SoM-img">
+				<div class="movement-stats">
+					<span>Run Speed: <strong id="runStat">0</strong></span>
+					<span>Walk Speed: <strong id="walkStat">0</strong></span>
+					<span>Stamina: <strong id="staminaStat">0</strong></span>
+				</div>
 			</div>
 		</div>
 
@@ -855,9 +866,9 @@
 		}
 
 		function updateGameStats() {
-			const select = document.getElementById("imageSelect")
+			const select = document.getElementById("SoM-select")
     		const selectedName = select.options[select.selectedIndex].text;
-			const img = document.getElementById("previewImg")
+			const img = document.getElementById("SoM-img")
 
 			if (select.value) {
 				img.src = select.value
