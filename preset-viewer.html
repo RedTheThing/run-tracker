@@ -554,15 +554,15 @@
 		window.onload = async () => {
 			try {
 				const [threatGenericData, threatSpecialData, penaltyGenericData, penaltyThreatData, penaltySpecialData, penaltySandboxData, itemGenericData, itemTarotData, itemSandboxData] = await Promise.all([
-					fetchJsonData('./threats-generic-data.json'),
-					fetchJsonData('./threats-special-data.json'),
-					fetchJsonData('penalty-generic-data.json'),
-					fetchJsonData('penalty-threat-data.json'),
-					fetchJsonData('penalty-special-data.json'),
-					fetchJsonData('penalty-sandbox-data.json'),
-					fetchJsonData('item-generic-data.json'),
-					fetchJsonData('item-tarot-data.json'),
-					fetchJsonData('item-sandbox-data.json')
+					fetchJsonData('./OMN Data/threats-generic-data.json'),
+					fetchJsonData('./OMN Data/threats-special-data.json'),
+					fetchJsonData('./OMN Data/penalty-generic-data.json'),
+					fetchJsonData('./OMN Data/penalty-threat-data.json'),
+					fetchJsonData('./OMN Data/penalty-special-data.json'),
+					fetchJsonData('./OMN Data/penalty-sandbox-data.json'),
+					fetchJsonData('./OMN Data/item-generic-data.json'),
+					fetchJsonData('./OMN Data/item-tarot-data.json'),
+					fetchJsonData('./OMN Data/item-sandbox-data.json')
 				]);
 
 				document.getElementById("parseBtn").onclick = () => parseInput(threatGenericData, threatSpecialData, penaltyGenericData, penaltyThreatData, penaltySpecialData, penaltySandboxData, itemGenericData, itemTarotData, itemSandboxData);

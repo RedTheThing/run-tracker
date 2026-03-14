@@ -152,8 +152,6 @@
 
 		/* Sticky header for search, filters, and progress bars within each tab */
 		.header-controls {
-			position: sticky;
-			top: 185px;
 			background-color: var(--bg-color);
 			z-index: 10;
 			padding: 20px 0 20px 0;
@@ -166,10 +164,9 @@
 		/* Disable sticky header-controls on mobile to save screen space */
 		@media (max-width: 768px) {
 			.header-controls {
-				position: relative;
-				top: auto;
+				position: relative !important;
+				top: auto !important;
 				z-index: 1;
-				padding-top: 0;
 			}
 		}
 
@@ -399,6 +396,7 @@
 		#penalty-threats .row.done .item-name { color: var(--threat-color); }
 
 		.weight { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+		.control-wrapper { display: flex; flex-direction: column; align-items: center; gap: 5px; margin-top: 8px; }
 		.controls { display: flex; align-items: center; gap: 8px; margin-left: 10px; flex-shrink: 0; }
 		button.btn-ctrl {
 			background-color: #2a2a2a; border: 1px solid #444; color: var(--text-main); border-radius: 4px;
@@ -413,11 +411,13 @@
 		}
 		.counter-text { font-weight: bold; min-width: 35px; text-align: center; font-variant-numeric: tabular-nums; font-size: 0.9rem; }
 
-		.checkmark { visibility: hidden; opacity: 0; font-weight: bold; font-size: 1.1rem; margin-left: 2px; width: 18px; text-align: center; transition: opacity 0.3s ease, visibility 0.3s ease; }
+		.checkmark, .checkmark-death { visibility: hidden; opacity: 0; font-weight: bold; font-size: 1.1rem; margin-left: 2px; width: 18px; text-align: center; transition: opacity 0.3s ease, visibility 0.3s ease; }
 		.row.done .checkmark { visibility: visible; opacity: 1; }
+		.row.deathdone .checkmark-death { visibility: visible; opacity: 1; }
 
 		#item-generics .row.done .checkmark { color: var(--accent); }
 		#item-tarots .row.done .checkmark { color: var(--gold); }
+		#item-tarots .row.deathdone .checkmark-death { color: var(--danger); }
 		#item-wofs .row.done .checkmark { color: var(--purple); }
 		#penalty-generics .row.done .checkmark { color: var(--generic-color); }
 		#penalty-threats .row.done .checkmark { color: var(--threat-color); }
@@ -522,62 +522,11 @@
 			<button class="tab-btn active" data-target="items" onclick="switchTab('items')">Items</button>
 			<button class="tab-btn" data-target="penalties" onclick="switchTab('penalties')">Penalties</button>
 		</div>
+
+		<div id="header-controls" class="header-controls"></div>
 	</div>
 
 	<main id="tab-items" class="tab-content dashboard active">
-		<div class="header-controls">
-			<div class="top-row">
-				<div class="search-wrapper">
-					<input type="text" id="itemSearch" class="search-input" placeholder="Search for items or cards..." oninput="filterItems()" onclick="clearItemSearch()">
-					<button class="clear-search" id="clearBtnItems" onclick="clearItemSearch()">✕</button>
-				</div>
-
-				<div class="category-filters">
-					<div id="filter-item-generics" class="filter-pill active" onclick="toggleItemCategoryVisibility('item-generics')">
-						<span>Generic</span> <span class="remaining-count" id="rem-item-generics">(0 left)</span>
-					</div>
-					<div id="filter-item-tarots" class="filter-pill active" onclick="toggleItemCategoryVisibility('item-tarots')">
-						<span>Tarot</span> <span class="remaining-count" id="rem-item-tarots">(0 left)</span>
-					</div>
-					<div id="filter-item-wofs" class="filter-pill active" onclick="toggleItemCategoryVisibility('item-wofs')">
-						<span>W.O.F.</span> <span class="remaining-count" id="rem-item-wofs">(0 left)</span>
-					</div>
-				</div>
-
-				<label class="toggle-completed-container" id="itemHideCompletedWrapper">
-					<input type="checkbox" id="itemHideCompletedCb" onchange="toggleItemHideCompleted()" style="display:none">
-					<span>Hide Completed</span>
-				</label>
-
-
-				 <label class="toggle-completed-container" id="enableTarotClothWrapper">
-					<input type="checkbox" id="enableTarotClothCb" onchange="toggleTarotCloth()" style="display:none">
-					<span>Force Tarot Cloth</span>
-				</label>
-			</div>
-
-			<div class="stats-bar">
-				<div class="stats-info">
-					<span class="tooltip-container">
-						Completion Progress <span class="info-icon">ⓘ</span>
-
-						<span class="tooltip-text">
-							<b>Tips:</b><br>
-							• Click an item box to increment it.<br>
-							• Clicking a Maxed item box will decrease its count by 1.<br>
-							• <b>Shift + Click</b> an item box to instantly Max it (or Reset if already maxed).<br>
-							• <b>Shift + Click</b> the <b>+</b> button to instantly Max it.<br>
-							• <b>Shift + Click</b> the <b>-</b> button to instantly Reset it.
-						</span>
-					</span>
-					<span id="itemCompletionText">0 / 0 items (0%)</span>
-				</div>
-				<div class="progress-container">
-					<div id="itemProgressFill" class="progress-fill"></div>
-				</div>
-			</div>
-		</div>
-
 		<section id="section-item-generics">
 			<div class="section-header" onclick="toggleItemSection('item-generics')">
 				<h1>Generic Items</h1>
@@ -628,59 +577,6 @@
 	</main>
 
 	<main id="tab-penalties" class="tab-content dashboard">
-		<div class="header-controls">
-			<div class="top-row">
-				<div class="search-wrapper">
-					<input type="text" id="penSearch" class="search-input" placeholder="Search penalties..." oninput="filterPenalties()" onclick="clearPenaltySearch()">
-
-					 <button class="clear-search" id="clearBtnPenalties" onclick="clearPenaltySearch()">✕</button>
-				</div>
-
-				<div class="category-filters">
-					<div id="filter-penalty-generics" class="filter-pill active" onclick="togglePenaltyCategoryVisibility('penalty-generics')">
-
-						 <span>Generic</span> <span class="remaining-count" id="rem-penalty-generics">(0 left)</span>
-					</div>
-					<div id="filter-penalty-threats" class="filter-pill active" onclick="togglePenaltyCategoryVisibility('penalty-threats')">
-						<span>Threat</span> <span class="remaining-count" id="rem-penalty-threats">(0 left)</span>
-
-					 </div>
-				</div>
-
-				<label class="toggle-completed-container" id="penHideCompletedWrapper">
-					<input type="checkbox" id="penHideCompletedCb" onchange="togglePenHideCompleted()" style="display:none">
-					<span>Hide Completed</span>
-
-				</label>
-
-				<label class="toggle-completed-container" id="excludeHeatstrokeWrapper">
-					<input type="checkbox" id="excludeHeatstrokeCb" onchange="toggleHeatstroke()" style="display:none">
-					<span>Exclude Heatstroke</span>
-				</label>
-			</div>
-
-			<div class="stats-bar">
-				<div class="stats-info">
-					<span class="tooltip-container">
-						Completion Progress <span class="info-icon">ⓘ</span>
-
-					 <span class="tooltip-text">
-							<b>Tips:</b><br>
-							• Click a penalty box to increment it.<br>
-							• Clicking a Maxed penalty box will decrease its count by 1.<br>
-							• <b>Shift + Click</b> a penalty box to instantly Max it (or Reset if already maxed).<br>
-							• <b>Shift + Click</b> the <b>-</b> button to instantly Reset it.<br>
-							• <b>Shift + Click</b> the <b>+</b> button to instantly Max it.
-						</span>
-					</span>
-					<span id="penCompletionText">0 / 0 penalties (0%)</span>
-				</div>
-				<div class="progress-container">
-					<div id="penProgressFill" class="progress-fill"></div>
-				</div>
-			</div>
-		</div>
-
 		<section id="section-penalty-generics">
 			<div class="section-header" onclick="togglePenaltySection('penalty-generics')">
 				<h1>Generic Penalties</h1>
@@ -716,7 +612,6 @@
 		<section class="reset-section">
 			<button class="reset-btn" onclick="showResetModal('penalties')">Reset Penalty Progress</button>
 		</section>
-
 	</main>
 
 	<div id="custom-modal-overlay" class="modal-overlay">
@@ -752,16 +647,9 @@
 			"Fooled":		{ power: 25, run: 14, walk: 8, stamina: 1 }
 		};
 
-		const romanMap = ["0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI"];
-
 		const nameOverrides = {
-			"Balloons4Sale": "Balloons 4 Sale",
-			"Chef4Hire": "Chef 4 Hire",
 			"ZGuesto'sTactics": "ZGuesto's Tactics",
-			"NoThoughts,HeadEmpty": "No Thoughts, Head Empty",
 			"JordiDoorCamper": "Jordi \"Door Camper\"",
-			"CutTheStrings": "Cut the Strings",
-			"DoNotHesitate": "Do not Hesitate"
 		};
 
 		const fallbackImage = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Crect width='50' height='50' fill='%232a2a2a'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='sans-serif' font-size='24' fill='%23777'%3E?%3C/text%3E%3C/svg%3E";
@@ -774,20 +662,20 @@
 			let name = id.replace(/([a-z])([A-Z0-9])/g, '$1 $2')
 						 .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
 
-			// 3. Handle apostrophes (fixes things like "ZGuesto ' s" getting split)
+			// 3. Insert spaces after numbers and commas in unfinished sentences
+			name = name.replace(/([0-9,])([a-zA-Z])/g, '$1 $2');
+
+			// 4. Handle apostrophes (fixes things like "ZGuesto ' s" getting split)
 			name = name.replace(/([a-z])\s*(['])\s*([a-z])/ig, '$1$2$3');
 
-			// 4. Remove WOF prefix
+			// 5. Remove WOF prefix
 			if (name.startsWith("WOF ")) name = name.substring(4);
-
-			// 5. Convert leading numbers to Roman numerals
-			name = name.replace(/^(\d+)/, (match) => romanMap[parseInt(match, 10)] || match);
 
 			// 6. Fix spacing around hyphens
 			name = name.replace(/\s*-\s*/, ' - ').trim();
 
 			// 7. Lowercase specific minor words
-			name = name.replace(/\b(And|As|Of|The|Who|Died)\b/gi, (m) => m.toLowerCase());
+			name = name.replace(/\b(And|As|Of|The|Who|Died|Not)\b/gi, (m) => m.toLowerCase());
 
 			// 8. Ensure the very first letter is always capitalized
 			name = name.charAt(0).toUpperCase() + name.slice(1);
@@ -855,6 +743,15 @@
 		// --- END MASTER STATE MANAGEMENT ---
 
 		function switchTab(tabName) {
+			document.getElementById("header-controls").innerHTML = renderHeader(tabName);
+			if (tabName === "items") {
+				applyItemVisibilityStates();
+				updateItemStats();
+			} else if (tabName === "penalties") {
+				applyPenaltyVisibilityStates();
+				updatePenaltyStats();
+			}
+
 			document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
 			document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
 
@@ -865,9 +762,104 @@
 			saveAllData();
 		}
 
+		function renderTabSpecifics(tab) {
+			if (tab === "items") {
+				return `
+					<div class="category-filters">
+						<div id="filter-item-generics" class="filter-pill active" onclick="toggleItemCategoryVisibility('item-generics')">
+							<span>Generic</span> <span class="remaining-count" id="rem-item-generics">(0 left)</span>
+						</div>
+						<div id="filter-item-tarots" class="filter-pill active" onclick="toggleItemCategoryVisibility('item-tarots')">
+							<span>Tarot</span> <span class="remaining-count" id="rem-item-tarots">(0 left)</span>
+						</div>
+						<div id="filter-item-wofs" class="filter-pill active" onclick="toggleItemCategoryVisibility('item-wofs')">
+							<span>W.O.F.</span> <span class="remaining-count" id="rem-item-wofs">(0 left)</span>
+						</div>
+					</div>
+
+					<label class="toggle-completed-container" id="itemHideCompletedWrapper">
+						<input type="checkbox" id="itemHideCompletedCb" onchange="toggleItemHideCompleted()" style="display:none">
+						<span>Hide Completed</span>
+					</label>
+
+
+					<label class="toggle-completed-container" id="enableTarotClothWrapper">
+						<input type="checkbox" id="enableTarotClothCb" onchange="toggleTarotCloth()" style="display:none">
+						<span>Force Tarot Cloth</span>
+					</label>
+				`
+			}
+
+			if (tab === "penalties") {
+				return `
+					<div class="category-filters">
+						<div id="filter-penalty-generics" class="filter-pill active" onclick="togglePenaltyCategoryVisibility('penalty-generics')">
+							<span>Generic</span> <span class="remaining-count" id="rem-penalty-generics">(0 left)</span>
+						</div>
+						<div id="filter-penalty-threats" class="filter-pill active" onclick="togglePenaltyCategoryVisibility('penalty-threats')">
+							<span>Threat</span> <span class="remaining-count" id="rem-penalty-threats">(0 left)</span>
+						</div>
+					</div>
+
+					<label class="toggle-completed-container" id="penHideCompletedWrapper">
+						<input type="checkbox" id="penHideCompletedCb" onchange="togglePenHideCompleted()" style="display:none">
+						<span>Hide Completed</span>
+
+					</label>
+
+					<label class="toggle-completed-container" id="excludeHeatstrokeWrapper">
+						<input type="checkbox" id="excludeHeatstrokeCb" onchange="toggleHeatstroke()" style="display:none">
+						<span>Exclude Heatstroke</span>
+					</label>
+				`
+			}
+		}
+
+		function renderHeader(tab) {
+			const isItems = tab === "items";
+
+			const name = isItems ? "item" : "penalty";
+			const an = isItems ? "n" : "";
+			const searchPlaceholder = isItems ? "Search for items or cards..." : "Search penalties...";
+
+			const searchOnInput = isItems ? "filterItems()" : "filterPenalties()";
+			const tabSpecifics = renderTabSpecifics(tab);
+
+			return `
+				<div class="top-row">
+					<div class="search-wrapper">
+						<input type="text" id="tabSearch" class="search-input" placeholder="${searchPlaceholder}" oninput="${searchOnInput}" onclick="clearSearch('${tab}')">
+						<button class="clear-search" id="clearBtn" onclick="clearSearch('${tab}')">✕</button>
+					</div>
+					${tabSpecifics}
+				</div>
+
+				<div class="stats-bar">
+					<div class="stats-info">
+						<span class="tooltip-container">
+							Completion Progress <span class="info-icon">ⓘ</span>
+
+							<span class="tooltip-text">
+								<b>Tips:</b><br>
+								• Click a${an} ${name} to increment its count.<br>
+								• Clicking a maxed ${name} will decrease its count by 1.<br>
+								• <b>Shift + Click</b> a${an} ${name} to instantly max it (or reset it if already maxed).<br>
+								• <b>Shift + Click</b> the <b>+</b> button to instantly max it.<br>
+								• <b>Shift + Click</b> the <b>-</b> button to reset it.
+							</span>
+						</span>
+						<span id="completionText">0 / 0 items (0%)</span>
+					</div>
+					<div class="progress-container">
+						<div id="progressFill" class="progress-fill"></div>
+					</div>
+				</div>
+			`;
+		}
+
 		function updateGameStats() {
 			const select = document.getElementById("SoM-select")
-    		const selectedName = select.options[select.selectedIndex].text;
+			const selectedName = select.options[select.selectedIndex].text;
 			const img = document.getElementById("SoM-img")
 
 			if (select.value) {
@@ -886,7 +878,7 @@
 			const bloxycolas = itemCounts.BloxyCola;
 			const increasedpowers = itemCounts.IncreasedPower;
 			const thestar = itemCounts["17-TheStar"];
-			const temperancepowerincreaseds = itemCounts.TemperancePowerIncreased
+			const temperancedeaths = itemCounts.TemperanceDeath;
 			const WOFbloxycolas = itemCounts.WOFBloxyCola;
 			const WOFbloxiades = itemCounts.WOFBloxiade;
 			const WOFcoffees = itemCounts.WOFCoffee;
@@ -908,7 +900,7 @@
 				stats.power	  += thestar * 15;
 			}
 
-			if (temperancepowerincreaseds > 0) {
+			if (temperancedeaths > 0) {
 				const temperanceMap = {
 					1: 10,
 					2: 15,
@@ -916,7 +908,7 @@
 					4: 20
 				};
 
-				const bonus = temperanceMap[temperancepowerincreaseds] || 0;
+				const bonus = temperanceMap[temperancedeaths] || 0;
 				stats.power += bonus;
 			}
 
@@ -947,8 +939,8 @@
 			}
 
 			// Round to 2 decimals
-			stats.run     = Number(stats.run.toFixed(2));
-			stats.walk    = Number(stats.walk.toFixed(2));
+			stats.run	 = Number(stats.run.toFixed(2));
+			stats.walk	= Number(stats.walk.toFixed(2));
 			stats.stamina = Number(stats.stamina.toFixed(2));
 			stats.power   = Number(stats.power.toFixed(2));
 
@@ -996,10 +988,27 @@
 					lockedClass = "locked-on";
 				}
 
+				let deathTracker = "";
+				let deathDone = "";
+
+				if (itemId === 'XIV-Temperance') {
+					let deathCount = itemCounts["TemperanceDeath"] || 0;
+					deathDone = deathCount === 4 ? "deathdone" : "";
+					deathTracker = `
+						<div class="controls" style="scale: 0.75;">
+							💔
+							<button id="btn-minus-TemperanceDeath" class="btn-ctrl" data-id="TemperanceDeath" onclick="updateItem(-1, 4, this.getAttribute('data-id'), event, false)" ${deathCount === 0 ? 'disabled' : ''}>-</button>
+							<div class="counter-text"><span id="TemperanceDeathCounter">${deathCount}</span> / 4</div>
+							<button id="btn-plus-TemperanceDeath" class="btn-ctrl" data-id="TemperanceDeath" onclick="updateItem(1, 4, this.getAttribute('data-id'), event, false)" ${deathCount === 4 ? 'disabled' : ''}>+</button>
+							<div class="checkmark-death">✓</div>
+						</div>
+					`;
+				}
+
 				const safeTitle = displayName.replace(/"/g, '&quot;');
 
 				const row = document.createElement("div");
-				row.className = `row ${isDone} ${lockedClass}`.trim();
+				row.className = `row ${isDone} ${deathDone} ${lockedClass}`.trim();
 				row.id = `row-${itemId}`;
 				row.setAttribute('data-id', safeId);
 				row.setAttribute('onclick', `updateItem(1, ${item.cap}, this.getAttribute('data-id'), event, true)`);
@@ -1011,11 +1020,14 @@
 							<div class="item-name" title="${safeTitle}">${displayName}</div>
 							<div class="weight">${statLabel}</div>
 						</div>
-						<div class="controls">
-							<button id="btn-minus-${safeId}" class="btn-ctrl" data-id="${safeId}" onclick="updateItem(-1, ${item.cap}, this.getAttribute('data-id'), event, false)" ${displayCount === 0 ? 'disabled' : ''}>-</button>
-							<div class="counter-text"><span id="${safeId}Counter">${displayCount}</span> / ${item.cap}</div>
-							<button id="btn-plus-${safeId}" class="btn-ctrl" data-id="${safeId}" onclick="updateItem(1, ${item.cap}, this.getAttribute('data-id'), event, false)" ${displayCount === item.cap ? 'disabled' : ''}>+</button>
-							<div class="checkmark">✓</div>
+						<div class="control-wrapper">
+							<div class="controls">
+								<button id="btn-minus-${safeId}" class="btn-ctrl" data-id="${safeId}" onclick="updateItem(-1, ${item.cap}, this.getAttribute('data-id'), event, false)" ${displayCount === 0 ? 'disabled' : ''}>-</button>
+								<div class="counter-text"><span id="${safeId}Counter">${displayCount}</span> / ${item.cap}</div>
+								<button id="btn-plus-${safeId}" class="btn-ctrl" data-id="${safeId}" onclick="updateItem(1, ${item.cap}, this.getAttribute('data-id'), event, false)" ${displayCount === item.cap ? 'disabled' : ''}>+</button>
+								<div class="checkmark">✓</div>
+							</div>
+							${deathTracker}
 						</div>
 					</div>
 					<div class="item-bar-container">
@@ -1145,8 +1157,8 @@
 			}
 
 			const totalPercent = totalPossibleAll > 0 ? Math.round((currentAll / totalPossibleAll) * 100) : 0;
-			const compText = document.getElementById('itemCompletionText');
-			const mainFill = document.getElementById('itemProgressFill');
+			const compText = document.getElementById('completionText');
+			const mainFill = document.getElementById('progressFill');
 			if(compText) compText.textContent = `${currentAll} / ${totalPossibleAll} items (${totalPercent}%)`;
 			if(mainFill) {
 				mainFill.style.width = totalPercent + '%';
@@ -1154,39 +1166,40 @@
 			}
 		}
 
-		function clearItemSearch() {
-			const searchInput = document.getElementById('itemSearch');
+		function clearSearch(tab) {
+			const searchInput = document.getElementById('tabSearch');
 			searchInput.classList.remove('flash');
 			void searchInput.offsetWidth;
 			searchInput.classList.add('flash');
 			setTimeout(() => searchInput.classList.remove('flash'), 500);
 			searchInput.value = '';
-			filterItems();
+			if (tab === "items") filterItems();
+			if (tab === "penalties") filterPenalties();
 			searchInput.focus();
 		}
 
 		function toggleItemHideCompleted() {
 			const hideDone = document.getElementById('itemHideCompletedCb').checked;
-			itemHideCompleted = hideDone;
+			let itemHideCompleted = hideDone;
 			saveAllData();
 			filterItems();
 		}
 
 		function filterItems() {
-			const query = document.getElementById('itemSearch').value.toLowerCase();
+			const query = document.getElementById('tabSearch').value.toLowerCase();
 			const hideDone = document.getElementById('itemHideCompletedCb').checked;
-			const clearBtn = document.getElementById('clearBtnItems');
+			const clearBtn = document.getElementById('clearBtn');
 
-			if(clearBtn) clearBtn.style.display = query.length > 0 ? 'block' : 'none';
+			if (clearBtn) clearBtn.style.display = query.length > 0 ? 'block' : 'none';
 
 			const wrapper = document.getElementById('itemHideCompletedWrapper');
-			if(wrapper) hideDone ? wrapper.classList.add('active') : wrapper.classList.remove('active');
+			if (wrapper) hideDone ? wrapper.classList.add('active') : wrapper.classList.remove('active');
 
 			document.querySelectorAll('#tab-items .row').forEach(row => {
 				const name = row.querySelector('.item-name').textContent.toLowerCase();
 				let isDone = row.classList.contains('done');
 
-				if (row.id === 'row-TarotCloth' && tarotClothEnabled) isDone = true; 
+				if (row.id === 'row-TarotCloth' && tarotClothEnabled) isDone = true;
 
 				const shouldBeVisible = name.includes(query) && (!hideDone || !isDone);
 				row.style.display = shouldBeVisible ? 'flex' : 'none';
@@ -1197,7 +1210,7 @@
 				if (!itemActiveCats[id]) return; 
 				const visibleRows = document.getElementById(id).querySelectorAll(`.row[style="display: flex;"], .row:not([style])`);
 
-				if(section) section.style.display = visibleRows.length > 0 ? 'block' : 'none';
+				if (section) section.style.display = visibleRows.length > 0 ? 'block' : 'none';
 
 				if (query !== "" && visibleRows.length > 0) {
 					const container = document.getElementById(id);
@@ -1247,20 +1260,21 @@
 			const counter = document.getElementById(`${safeId}Counter`);
 			const bar = document.getElementById(`${safeId}Bar`);
 
-			if(counter) counter.textContent = itemCounts[itemId];
+			if (counter) counter.textContent = itemCounts[itemId];
 
 			const btnMinus = document.getElementById(`btn-minus-${safeId}`);
 			const btnPlus = document.getElementById(`btn-plus-${safeId}`);
-			if(btnMinus) btnMinus.disabled = (itemCounts[itemId] === 0);
-			if(btnPlus) btnPlus.disabled = (itemCounts[itemId] === cap);
+			if (btnMinus) btnMinus.disabled = (itemCounts[itemId] === 0);
+			if (btnPlus) btnPlus.disabled = (itemCounts[itemId] === cap);
 
-			if(bar) {
+			if (bar) {
 				bar.style.width = percent + '%';
 				bar.style.backgroundColor = getProgressColor(percent);
 				itemCounts[itemId] === cap ? bar.classList.add("sparkle") : bar.classList.remove("sparkle");
 			}
 
-			if(rowElement) itemCounts[itemId] === cap ? rowElement.classList.add("done") : rowElement.classList.remove("done");
+			if (rowElement) itemCounts[itemId] === cap ? rowElement.classList.add("done") : rowElement.classList.remove("done");
+			if (itemId === "TemperanceDeath") itemCounts["TemperanceDeath"] === 4 ? document.getElementById("row-XIV-Temperance").classList.add("deathdone") : document.getElementById("row-XIV-Temperance").classList.remove("deathdone");
 
 			saveAllData();
 			filterItems(); 
@@ -1287,12 +1301,15 @@
 				if(btnMinus) btnMinus.disabled = true;
 				if(btnPlus) btnPlus.disabled = false;
 
-				if(bar) { 
+				if(bar) {
 					bar.style.width = '0%';
 					bar.style.backgroundColor = getProgressColor(0); 
 					bar.classList.remove("sparkle");
 				}
-				if(row) row.classList.remove("done");
+				if(row) {
+					row.classList.remove("done");
+					row.classList.remove("deathdone");
+				}
 			}
 
 			saveAllData();
@@ -1355,7 +1372,7 @@
 							<div class="counter-text"><span id="${safeId}Counter">${displayCount}</span> / ${item.cap}</div>
 							<button id="btn-pen-plus-${safeId}" class="btn-ctrl" data-id="${safeId}" onclick="updatePen(1, ${item.cap}, this.getAttribute('data-id'), event, false)" ${displayCount === item.cap ? 'disabled' : ''}>+</button>
 							<div class="checkmark">✓</div>
-						 </div>
+						</div>
 					</div>
 					<div class="item-bar-container">
 						<div id="${safeId}Bar" class="item-bar-fill ${sparkleClass}" style="width: ${percent}%; background-color: ${getPenaltyProgressColor(percent)};"></div>
@@ -1443,13 +1460,11 @@
 			let totalPossibleAll = 0, currentAll = 0;
 			for (const [catId, itemIds] of Object.entries(penCategoryMap)) {
 				let catPossible = 0, catCurrent = 0;
-				itemIds.forEach(id => { 
-					let cap = penCaps[id] || 0;
-					catPossible += cap;
-					if (id === 'Heatstroke' && heatstrokeExcluded) {
-						catPossible -= cap; 
-					} else {
-						catCurrent += (penCounts[id] || 0); 
+				itemIds.forEach(id => {
+					// If it isn't Heatstroke, add it, and if it is, only add it if it's not excluded
+					if (id !== 'Heatstroke' || !heatstrokeExcluded) {
+						catPossible += penCaps[id] || 0;
+						catCurrent += penCounts[id] || 0; 
 					}
 				});
 				totalPossibleAll += catPossible; currentAll += catCurrent;
@@ -1481,8 +1496,8 @@
 			}
 
 			const totalPercent = totalPossibleAll > 0 ? Math.round((currentAll / totalPossibleAll) * 100) : 0;
-			const compText = document.getElementById('penCompletionText');
-			const mainFill = document.getElementById('penProgressFill');
+			const compText = document.getElementById('completionText');
+			const mainFill = document.getElementById('progressFill');
 			if (compText) compText.textContent = `${currentAll} / ${totalPossibleAll} penalties (${totalPercent}%)`;
 			if (mainFill) {
 				mainFill.style.width = totalPercent + '%';
@@ -1490,33 +1505,22 @@
 			}
 		}
 
-		function clearPenaltySearch() {
-			const searchInput = document.getElementById('penSearch');
-			searchInput.classList.remove('flash');
-			void searchInput.offsetWidth; 
-			searchInput.classList.add('flash');
-			setTimeout(() => searchInput.classList.remove('flash'), 500);
-			searchInput.value = '';
-			filterPenalties();
-			searchInput.focus();
-		}
-
 		function togglePenHideCompleted() {
 			const hideDone = document.getElementById('penHideCompletedCb').checked;
-			penHideCompleted = hideDone;
+			let penHideCompleted = hideDone;
 			saveAllData();
 			filterPenalties();
 		}
 
 		function filterPenalties() {
-			const query = document.getElementById('penSearch').value.toLowerCase();
+			const query = document.getElementById('tabSearch').value.toLowerCase();
 			const hideDone = document.getElementById('penHideCompletedCb').checked;
-			const clearBtn = document.getElementById('clearBtnPenalties');
+			const clearBtn = document.getElementById('clearBtn');
 
 			if (clearBtn) clearBtn.style.display = query.length > 0 ? 'block' : 'none';
 
 			const wrapper = document.getElementById('penHideCompletedWrapper');
-			if(wrapper) hideDone ? wrapper.classList.add('active') : wrapper.classList.remove('active');
+			if (wrapper) hideDone ? wrapper.classList.add('active') : wrapper.classList.remove('active');
 
 			document.querySelectorAll('#tab-penalties .row').forEach(row => {
 				const name = row.querySelector('.item-name').textContent.toLowerCase();
@@ -1524,7 +1528,7 @@
 
 				if (row.id === 'row-Heatstroke' && heatstrokeExcluded) isDone = true;
 
-				 const shouldBeVisible = name.includes(query) && (!hideDone || !isDone);
+				const shouldBeVisible = name.includes(query) && (!hideDone || !isDone);
 				row.style.display = shouldBeVisible ? 'flex' : 'none';
 			});
 
@@ -1682,14 +1686,8 @@
 
 				e.preventDefault(); 
 
-				const activeTab = localStorage.getItem('runTrackerActiveTab') || 'items';
-				if (activeTab === 'items') {
-					const itemSearch = document.getElementById('itemSearch');
-					if (itemSearch) itemSearch.focus();
-				} else {
-					const penSearch = document.getElementById('penSearch');
-					if (penSearch) penSearch.focus();
-				}
+				const tabSearch = document.getElementById('tabSearch');
+				if (tabSearch) tabSearch.focus();
 			}
 		});
 
@@ -1705,11 +1703,11 @@
 
 			try {
 				const [itemGenericData, itemTarotData, itemWofData, penaltyGenericData, penaltyThreatData] = await Promise.all([
-					fetchJsonData('item-generic-data.json'),
-					fetchJsonData('item-tarot-data.json'),
-					fetchJsonData('item-wof-data.json'),
-					fetchJsonData('penalty-generic-data.json'),
-					fetchJsonData('penalty-threat-data.json')
+					fetchJsonData('./OMN Data/item-generic-data.json'),
+					fetchJsonData('./OMN Data/item-tarot-data.json'),
+					fetchJsonData('./OMN Data/item-wof-data.json'),
+					fetchJsonData('./OMN Data/penalty-generic-data.json'),
+					fetchJsonData('./OMN Data/penalty-threat-data.json')
 				]);
 
 				renderItemCategory(itemGenericData, "item-generics");
@@ -1737,8 +1735,10 @@
 					}
 				});
 
-				applyItemVisibilityStates();
-				updateItemStats();
+				if (savedTab === "items") {
+					applyItemVisibilityStates();
+					updateItemStats();
+				}
 
 				renderPenaltyCategory(penaltyGenericData, "penalty-generics");
 				renderPenaltyCategory(penaltyThreatData, "penalty-threats");
@@ -1764,8 +1764,11 @@
 					}
 				});
 
-				applyPenaltyVisibilityStates();
-				updatePenaltyStats();
+				if (savedTab === "penalties") {
+					applyPenaltyVisibilityStates();
+					updatePenaltyStats();
+				}
+
 				updateGameStats();
 
 			} catch (error) {

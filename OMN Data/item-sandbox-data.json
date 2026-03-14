@@ -1,0 +1,15 @@
+{
+	"Adrenaline": {"image": "https://static.wikitide.net/onemorenightwiki/thumb/7/77/AdrenalineSD.jpg/80px-AdrenalineSD.jpg", "cap": 1},
+	"Hope": {"image": "https://static.wikitide.net/onemorenightwiki/thumb/0/00/Hope.jpg/80px-Hope.jpg", "cap": 1},
+	"Hunger": {"image": "https://static.wikitide.net/onemorenightwiki/thumb/2/2f/Hunger.jpg/80px-Hunger.jpg", "cap": 1},
+	"Powerless": {"image": "https://static.wikitide.net/onemorenightwiki/thumb/a/a6/Powerless.jpg/80px-Powerless.jpg", "cap": 1},
+	"Barry'sTopHat":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/c/cd/Barry%27sHatIcon.webp/75px-Barry%27sHatIcon.webp.png","cap":1},
+	"RedFlag":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/8/87/RedFlagIcon.png/75px-RedFlagIcon.png","cap":1},
+	"Dry'sCalculator":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/b/b6/Dry%27sCalculatorIcon.webp/75px-Dry%27sCalculatorIcon.webp.png","cap":1},
+	"Figure'sGlowstick":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/f/fb/Figure%27sGlowstick.webp/75px-Figure%27sGlowstick.webp.png","cap":1},
+	"FumoSticker":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/4/42/FumoStickerIcon.webp/75px-FumoStickerIcon.webp.png","cap":1},
+	"Giftbox":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/c/c6/Giftbox.png/75px-Giftbox.png","cap":1},
+	"Isra'sChicken":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/c/ca/Isra%27sChickenIcon.webp/75px-Isra%27sChickenIcon.webp.png","cap":1},
+	"Jordi'sPaintBrush":{"image":"https://static.wikitide.net/onemorenightwiki/thumb/3/30/Jordi%27sPaintbrushIcon.webp/75px-Jordi%27sPaintbrushIcon.webp.png","cap":1},
+	"MyOwnShadow": {"image":"https://static.wikitide.net/onemorenightwiki/b/bd/MyOwnShadowIcon.png","cap":1}
+}
