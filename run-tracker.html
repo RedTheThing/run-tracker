@@ -334,11 +334,11 @@
 		.toggle-btn { background: none; border: none; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; width: auto; height: auto; padding: 5px 10px; font-weight: bold; cursor: pointer; }
 
 		/* Responsive grid layout for the item/penalty cards */
-		.grid-container { 
+		.grid-container {
 			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); 
-			gap: 15px; 
-			padding: 0 5px; 
+			grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+			gap: 15px;
+			padding: 0 5px;
 		}
 		.grid-container.collapsed { display: none !important; }
 
@@ -433,19 +433,19 @@
 		.item-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.3s ease, background-color 0.3s ease; position: relative; overflow: hidden; }
 
 		/* Use transform for GPU-accelerated movement instead of left */
-		@keyframes barSparkle { 
-			0% { transform: translateX(-80px); } 
+		@keyframes barSparkle {
+			0% { transform: translateX(-80px); }
 			100% { transform: translateX(500px); }
 		}
 
-		.item-bar-fill.sparkle::after { 
-			content: ''; 
-			position: absolute; 
-			top: 0; 
-			left: 0; 
-			width: 80px; 
-			height: 100%; 
-			background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent); 
+		.item-bar-fill.sparkle::after {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 80px;
+			height: 100%;
+			background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
 			animation: barSparkle 2.5s infinite linear;
 			will-change: transform;
 		}
@@ -462,9 +462,9 @@
 			opacity: 0; transition: opacity 0.2s ease;
 		}
 
-		.modal-overlay.show { 
-			display: flex; 
-			opacity: 1; 
+		.modal-overlay.show {
+			display: flex;
+			opacity: 1;
 		}
 
 		.modal-box {
@@ -474,8 +474,8 @@
 			transform: translateY(-20px); transition: transform 0.2s ease;
 		}
 
-		.modal-overlay.show .modal-box { 
-			transform: translateY(0); 
+		.modal-overlay.show .modal-box {
+			transform: translateY(0);
 		}
 
 		.modal-box h2 { margin-top: 0; color: var(--text-main); }
@@ -483,7 +483,7 @@
 		.modal-actions { display: flex; justify-content: center; gap: 15px; }
 
 		.modal-btn {
-			padding: 10px 20px; border-radius: 6px; border: none; 
+			padding: 10px 20px; border-radius: 6px; border: none;
 			font-weight: bold; cursor: pointer; font-size: 1rem; transition: background 0.2s;
 		}
 
@@ -520,13 +520,13 @@
 			<div class="game-stats-row">
 				<div class="power-stat"></div>
 				<select id="SoM-select" onchange="updateGameStats()">
-					<option value="https://static.wikitide.net/onemorenightwiki/thumb/5/53/GuilyStateofMind.JPG/300px-GuilyStateofMind.JPG">Guilty</option>
-					<option value="https://static.wikitide.net/onemorenightwiki/thumb/3/39/CalmStateofMind.JPG/300px-CalmStateofMind.JPG">Calm</option>
-					<option value="https://static.wikitide.net/onemorenightwiki/thumb/3/38/DevastatedStateofMind.JPG/300px-DevastatedStateofMind.JPG">Devastated</option>
-					<option value="https://static.wikitide.net/onemorenightwiki/thumb/7/76/ScorchedStateofMind.JPG/300px-ScorchedStateofMind.JPG">Scorched</option>
-					<option value="https://static.wikitide.net/onemorenightwiki/8/89/SoakedStateofMind.jpg">Soaked</option>
-					<option value="https://static.wikitide.net/onemorenightwiki/7/71/APuppet.jpg">A Puppet</option>
-					<option value="https://static.wikitide.net/onemorenightwiki/a/a1/LostStateofMind.JPG">Fooled</option>
+					<option value="Guilty">Guilty</option>
+					<option value="Calm">Calm</option>
+					<option value="Devastated">Devastated</option>
+					<option value="Scorched">Scorched</option>
+					<option value="Soaked">Soaked</option>
+					<option value="A Puppet">A Puppet</option>
+					<option value="Fooled">Fooled</option>
 				</select>
 				<div class="movement-stats"></div>
 			</div>
@@ -576,7 +576,7 @@
 		<section id="section-item-wofs">
 			<div class="section-header" onclick="toggleItemSection('item-wofs')">
 
-				 <h1>Wheel of Fortune</h1>
+				<h1>Wheel of Fortune</h1>
 				<div class="section-progress-wrapper">
 					<div class="section-progress-text" id="stats-text-item-wofs">0%</div>
 					<div class="section-progress-container">
@@ -600,7 +600,7 @@
 				<h1>Generic Penalties</h1>
 				<div class="section-progress-wrapper">
 
-					 <div class="section-progress-text" id="stats-text-penalty-generics">0%</div>
+					<div class="section-progress-text" id="stats-text-penalty-generics">0%</div>
 					<div class="section-progress-container">
 						<div class="section-progress-fill" id="stats-fill-penalty-generics"></div>
 					</div>
@@ -656,7 +656,7 @@
 	<script>
 		function escapeId(id) { return id; }
 
-		function getProgressColor(percent) { 
+		function getProgressColor(percent) {
 			return `hsl(${(percent / 100) * 120}, 70%, 45%)`;
 		}
 
@@ -673,6 +673,16 @@
 			"Soaked":		{ power: 105 },
 			"A Puppet":		{ power: 105 },
 			"Fooled":		{ power: 25, run: 14, walk: 8, stamina: 1 }
+		};
+
+		const SoMImageMap = {
+			"Guilty":		"https://static.wikitide.net/onemorenightwiki/thumb/5/53/GuilyStateofMind.JPG/300px-GuilyStateofMind.JPG",
+			"Calm":			"https://static.wikitide.net/onemorenightwiki/thumb/3/39/CalmStateofMind.JPG/300px-CalmStateofMind.JPG",
+			"Devastated":	"https://static.wikitide.net/onemorenightwiki/thumb/3/38/DevastatedStateofMind.JPG/300px-DevastatedStateofMind.JPG",
+			"Scorched":		"https://static.wikitide.net/onemorenightwiki/thumb/7/76/ScorchedStateofMind.JPG/300px-ScorchedStateofMind.JPG",
+			"Soaked":		"https://static.wikitide.net/onemorenightwiki/8/89/SoakedStateofMind.jpg",
+			"A Puppet":		"https://static.wikitide.net/onemorenightwiki/7/71/APuppet.jpg",
+			"Fooled":		"https://static.wikitide.net/onemorenightwiki/a/a1/LostStateofMind.JPG"
 		};
 
 		const nameOverrides = {
@@ -732,13 +742,14 @@
 				penHideCompleted: JSON.parse(localStorage.getItem("penaltyTrackerHideCompleted")) || false,
 				heatstrokeExcluded: JSON.parse(localStorage.getItem("penaltyTrackerExcludeHeatstroke")) || false,
 
-				activeTab: localStorage.getItem("runTrackerActiveTab") || 'items'
+				activeTab: localStorage.getItem("runTrackerActiveTab") || 'items',
+				som: JSON.parse(localStorage.getItem("runTrackerSoM")) || 'Guilty',
 			};
 
 			// Clean up the old keys so they don't clutter the browser storage
 			const oldKeys = [
-				"itemTrackerCounts", "itemTrackerCollapsed", "itemTrackerActiveCats", "itemTrackerHideCompleted", "itemTrackerEnableTarotCloth", 
-				"penaltyTrackerCounts", "penaltyTrackerCollapsed", "penaltyTrackerActiveCats", "penaltyTrackerHideCompleted", "penaltyTrackerExcludeHeatstroke", 
+				"itemTrackerCounts", "itemTrackerCollapsed", "itemTrackerActiveCats", "itemTrackerHideCompleted", "itemTrackerEnableTarotCloth",
+				"penaltyTrackerCounts", "penaltyTrackerCollapsed", "penaltyTrackerActiveCats", "penaltyTrackerHideCompleted", "penaltyTrackerExcludeHeatstroke",
 				"runTrackerActiveTab"
 			];
 			oldKeys.forEach(key => localStorage.removeItem(key));
@@ -760,11 +771,13 @@
 		const penHideCompleted = masterSave.penHideCompleted;
 		let heatstrokeExcluded = masterSave.heatstrokeExcluded;
 
+		let som = masterSave.som;
+
 		function saveAllData() {
 			masterSave = {
 				itemCounts, itemCollapsed: itemCollapsedStates, itemActiveCats, itemHideCompleted, tarotClothEnabled,
 				penCounts, penCollapsed: penCollapsedStates, penActiveCats, penHideCompleted, heatstrokeExcluded,
-				activeTab: localStorage.getItem('runTrackerActiveTab') || 'items' 
+				activeTab: localStorage.getItem('runTrackerActiveTab') || 'items', som
 			};
 			localStorage.setItem('runTrackerSaveData', JSON.stringify(masterSave));
 		}
@@ -887,15 +900,12 @@
 
 		function updateGameStats() {
 			const select = document.getElementById("SoM-select")
-			const selectedName = select.options[select.selectedIndex].text;
+			const selectedName = select.value;
+			som = selectedName;
+			saveAllData();
 			const img = document.getElementById("SoM-img")
 
-			if (select.value) {
-				img.src = select.value
-				img.style.display = "block"
-			} else {
-				img.style.display = "none"
-			}
+			img.src = SoMImageMap[selectedName]
 
 			// Merge Guilty stats with selected SoM stats
 			let stats = {
@@ -983,7 +993,7 @@
 
 		function renderItemCategory(data, containerId) {
 			const container = document.getElementById(containerId);
-			const fragment = document.createDocumentFragment(); 
+			const fragment = document.createDocumentFragment();
 
 			for (const [itemId, item] of Object.entries(data)) {
 				itemCounts[itemId] = Math.min(item.cap, itemCounts[itemId] || 0);
@@ -1079,9 +1089,9 @@
 						<div id="${safeId}Bar" class="item-bar-fill ${sparkleClass}" style="width: ${percent}%; background-color: ${getProgressColor(percent)}"></div>
 					</div>
 				`;
-				fragment.appendChild(row); 
+				fragment.appendChild(row);
 			}
-			container.appendChild(fragment); 
+			container.appendChild(fragment);
 		}
 
 		function toggleItemSection(containerId) {
@@ -1127,8 +1137,8 @@
 
 				if (tarotClothEnabled) {
 					if (counter) counter.textContent = itemCap;
-					if (btnMinus) btnMinus.disabled = true;  
-					if (btnPlus) btnPlus.disabled = true;	
+					if (btnMinus) btnMinus.disabled = true;
+					if (btnPlus) btnPlus.disabled = true;
 					if (bar) {
 						bar.style.width = '100%';
 						bar.style.backgroundColor = getProgressColor(100);
@@ -1138,8 +1148,8 @@
 					tcRow.classList.add('locked-on');
 				} else {
 					if (counter) counter.textContent = realCount;
-					if (btnMinus) btnMinus.disabled = (realCount === 0);		
-					if (btnPlus) btnPlus.disabled = (realCount === itemCap);	
+					if (btnMinus) btnMinus.disabled = (realCount === 0);
+					if (btnPlus) btnPlus.disabled = (realCount === itemCap);
 					if (bar) {
 						const percent = (realCount / itemCap) * 100;
 						bar.style.width = percent + '%';
@@ -1162,14 +1172,14 @@
 			let totalPossibleAll = 0, currentAll = 0;
 			for (const [catId, itemIds] of Object.entries(itemCategoryMap)) {
 				let catPossible = 0, catCurrent = 0;
-				itemIds.forEach(id => { 
+				itemIds.forEach(id => {
 					let cap = itemCaps[id] || 0;
-					catPossible += cap; 
+					catPossible += cap;
 
 					if (id === 'TarotCloth' && tarotClothEnabled) {
-						catCurrent += cap; 
+						catCurrent += cap;
 					} else {
-						catCurrent += (itemCounts[id] || 0); 
+						catCurrent += (itemCounts[id] || 0);
 					}
 				});
 
@@ -1183,19 +1193,19 @@
 				const fillElem = document.getElementById(`stats-fill-${catId}`);
 				const remElem = document.getElementById(`rem-${catId}`);
 
-				if(textElem) textElem.textContent = `${catPercent}%`;
+				if (textElem) textElem.textContent = `${catPercent}%`;
 
 				if (catRemaining === 0 && catPossible > 0) {
-					if(remElem) remElem.textContent = `(MAX)`;
-					if(pill) pill.classList.add('complete');
-					if(header) header.classList.add(`mastery-${catId}`);
+					if (remElem) remElem.textContent = `(MAX)`;
+					if (pill) pill.classList.add('complete');
+					if (header) header.classList.add(`mastery-${catId}`);
 				} else {
-					if(remElem) remElem.textContent = `(${catRemaining} left)`;
-					if(pill) pill.classList.remove('complete');
-					if(header) header.classList.remove(`mastery-${catId}`);
+					if (remElem) remElem.textContent = `(${catRemaining} left)`;
+					if (pill) pill.classList.remove('complete');
+					if (header) header.classList.remove(`mastery-${catId}`);
 				}
 
-				if(fillElem) {
+				if (fillElem) {
 					fillElem.style.width = `${catPercent}%`;
 					fillElem.style.backgroundColor = getProgressColor(catPercent);
 				}
@@ -1204,8 +1214,8 @@
 			const totalPercent = totalPossibleAll > 0 ? Math.round((currentAll / totalPossibleAll) * 100) : 0;
 			const compText = document.getElementById('completionText');
 			const mainFill = document.getElementById('progressFill');
-			if(compText) compText.textContent = `${currentAll} / ${totalPossibleAll} items (${totalPercent}%)`;
-			if(mainFill) {
+			if (compText) compText.textContent = `${currentAll} / ${totalPossibleAll} items (${totalPercent}%)`;
+			if (mainFill) {
 				mainFill.style.width = totalPercent + '%';
 				mainFill.style.backgroundColor = getProgressColor(totalPercent);
 			}
@@ -1252,7 +1262,7 @@
 
 			['item-generics', 'item-tarots', 'item-wofs'].forEach(id => {
 				const section = document.getElementById(`section-${id}`);
-				if (!itemActiveCats[id]) return; 
+				if (!itemActiveCats[id]) return;
 				const visibleRows = document.getElementById(id).querySelectorAll(`.row[style="display: flex;"], .row:not([style])`);
 
 				if (section) section.style.display = visibleRows.length > 0 ? 'block' : 'none';
@@ -1260,8 +1270,8 @@
 				if (query !== "" && visibleRows.length > 0) {
 					const container = document.getElementById(id);
 					const btn = document.getElementById('btn-' + id);
-					if(container) container.classList.remove('collapsed');
-					if(btn) btn.textContent = 'Collapse';
+					if (container) container.classList.remove('collapsed');
+					if (btn) btn.textContent = 'Collapse';
 				} else if (query === "") {
 					const container = document.getElementById(id);
 					const btn = document.getElementById('btn-' + id);
@@ -1291,10 +1301,10 @@
 				} else if (isBoxClick) {
 					itemCounts[itemId] = (current === cap) ? 0 : cap;
 				}
-			} 
+			}
 			else if (current === cap && delta > 0 && isBoxClick) {
 				itemCounts[itemId] = Math.max(0, current - 1);
-			} 
+			}
 			else {
 				itemCounts[itemId] = Math.min(cap, Math.max(0, current + delta));
 			}
@@ -1323,7 +1333,7 @@
 			if (itemId === "rewardCount") itemCounts["rewardCount"] === 10 ? document.getElementById("row-X-WheelOfFortune").classList.add("rewarddone") : document.getElementById("row-X-WheelOfFortune").classList.remove("rewarddone");
 
 			saveAllData();
-			filterItems(); 
+			filterItems();
 			updateItemStats();
 			updateGameStats();
 		}
@@ -1340,19 +1350,19 @@
 					continue;
 				}
 
-				if(counter) counter.textContent = 0;
+				if (counter) counter.textContent = 0;
 
 				const btnMinus = document.getElementById(`btn-minus-${safeId}`);
 				const btnPlus = document.getElementById(`btn-plus-${safeId}`);
-				if(btnMinus) btnMinus.disabled = true;
-				if(btnPlus) btnPlus.disabled = false;
+				if (btnMinus) btnMinus.disabled = true;
+				if (btnPlus) btnPlus.disabled = false;
 
-				if(bar) {
+				if (bar) {
 					bar.style.width = '0%';
-					bar.style.backgroundColor = getProgressColor(0); 
+					bar.style.backgroundColor = getProgressColor(0);
 					bar.classList.remove("sparkle");
 				}
-				if(row) {
+				if (row) {
 					row.classList.remove("done");
 					row.classList.remove("deathdone");
 					row.classList.remove("rewarddone");
@@ -1371,7 +1381,7 @@
 
 		function renderPenaltyCategory(data, containerId) {
 			const container = document.getElementById(containerId);
-			const fragment = document.createDocumentFragment(); 
+			const fragment = document.createDocumentFragment();
 
 			for (const [itemId, item] of Object.entries(data)) {
 				penCounts[itemId] = Math.min(item.cap, penCounts[itemId] || 0);
@@ -1403,13 +1413,13 @@
 				}
 
 				row.id = `row-${itemId}`;
-				row.setAttribute('data-id', safeId); 
+				row.setAttribute('data-id', safeId);
 				row.setAttribute('onclick', `updatePen(1, ${item.cap}, this.getAttribute('data-id'), event, true)`);
 
 				row.innerHTML = `
 					<div class="row-content">
 						<div class="image-column">
-							 <img src="${item.image ? item.image : fallbackImage}" alt="icon" loading="lazy" onerror="this.onerror=null; this.src=fallbackImage;">
+							<img src="${item.image ? item.image : fallbackImage}" alt="icon" loading="lazy" onerror="this.onerror=null; this.src=fallbackImage;">
 						</div>
 						<div class="item-info">
 							<div class="item-name" title="${safeTitle}">${displayName}</div>
@@ -1425,9 +1435,9 @@
 						<div id="${safeId}Bar" class="item-bar-fill ${sparkleClass}" style="width: ${percent}%; background-color: ${getPenaltyProgressColor(percent)};"></div>
 					</div>
 				`;
-				fragment.appendChild(row); 
+				fragment.appendChild(row);
 			}
-			container.appendChild(fragment); 
+			container.appendChild(fragment);
 		}
 
 		function toggleHeatstroke() {
@@ -1447,10 +1457,10 @@
 				const btnPlus = document.getElementById(`btn-pen-plus-Heatstroke`);
 
 				if (heatstrokeExcluded) {
-					 hsRow.classList.add('excluded');
+					hsRow.classList.add('excluded');
 					if (counter) counter.textContent = 0;
-					if (btnMinus) btnMinus.disabled = true;  
-					if (btnPlus) btnPlus.disabled = true;	
+					if (btnMinus) btnMinus.disabled = true;
+					if (btnPlus) btnPlus.disabled = true;
 					if (bar) {
 						bar.style.width = '0%';
 						bar.style.backgroundColor = getPenaltyProgressColor(0);
@@ -1460,8 +1470,8 @@
 				} else {
 					hsRow.classList.remove('excluded');
 					if (counter) counter.textContent = realCount;
-					if (btnMinus) btnMinus.disabled = (realCount === 0);		
-					if (btnPlus) btnPlus.disabled = (realCount === itemCap);	
+					if (btnMinus) btnMinus.disabled = (realCount === 0);
+					if (btnPlus) btnPlus.disabled = (realCount === itemCap);
 					if (bar) {
 						const percent = (realCount / itemCap) * 100;
 						bar.style.width = percent + '%';
@@ -1482,7 +1492,7 @@
 			const container = document.getElementById(containerId);
 			const btn = document.getElementById('btn-' + containerId);
 			const isCollapsed = container.classList.toggle('collapsed');
-			if(btn) btn.textContent = isCollapsed ? 'Expand' : 'Collapse';
+			if (btn) btn.textContent = isCollapsed ? 'Expand' : 'Collapse';
 			penCollapsedStates[containerId] = isCollapsed;
 			saveAllData();
 		}
@@ -1511,7 +1521,7 @@
 					// If it isn't Heatstroke, add it, and if it is, only add it if it's not excluded
 					if (id !== 'Heatstroke' || !heatstrokeExcluded) {
 						catPossible += penCaps[id] || 0;
-						catCurrent += penCounts[id] || 0; 
+						catCurrent += penCounts[id] || 0;
 					}
 				});
 				totalPossibleAll += catPossible; currentAll += catCurrent;
@@ -1581,7 +1591,7 @@
 
 			['penalty-generics', 'penalty-threats'].forEach(id => {
 				const section = document.getElementById(`section-${id}`);
-				if (!penActiveCats[id]) return; 
+				if (!penActiveCats[id]) return;
 				const visibleRows = document.getElementById(id).querySelectorAll(`.row[style="display: flex;"], .row:not([style])`);
 
 				if (section) section.style.display = visibleRows.length > 0 ? 'block' : 'none';
@@ -1589,8 +1599,8 @@
 				if (query !== "" && visibleRows.length > 0) {
 					const container = document.getElementById(id);
 					const btn = document.getElementById('btn-' + id);
-					if(container) container.classList.remove('collapsed');
-					if(btn) btn.textContent = 'Collapse';
+					if (container) container.classList.remove('collapsed');
+					if (btn) btn.textContent = 'Collapse';
 				} else if (query === "") {
 					const container = document.getElementById(id);
 					const btn = document.getElementById('btn-' + id);
@@ -1620,10 +1630,10 @@
 				} else if (isBoxClick) {
 					penCounts[itemId] = (current === cap) ? 0 : cap;
 				}
-			} 
+			}
 			else if (current === cap && delta > 0 && isBoxClick) {
 				penCounts[itemId] = Math.max(0, current - 1);
-			} 
+			}
 			else {
 				penCounts[itemId] = Math.min(cap, Math.max(0, current + delta));
 			}
@@ -1638,8 +1648,8 @@
 
 			const btnMinus = document.getElementById(`btn-pen-minus-${safeId}`);
 			const btnPlus = document.getElementById(`btn-pen-plus-${safeId}`);
-			if(btnMinus) btnMinus.disabled = (penCounts[itemId] === 0);
-			if(btnPlus) btnPlus.disabled = (penCounts[itemId] === cap);
+			if (btnMinus) btnMinus.disabled = (penCounts[itemId] === 0);
+			if (btnPlus) btnPlus.disabled = (penCounts[itemId] === cap);
 
 			if (bar) {
 				bar.style.width = percent + '%';
@@ -1670,10 +1680,10 @@
 
 				const btnMinus = document.getElementById(`btn-pen-minus-${safeId}`);
 				const btnPlus = document.getElementById(`btn-pen-plus-${safeId}`);
-				if(btnMinus) btnMinus.disabled = true;
-				if(btnPlus) btnPlus.disabled = false;
+				if (btnMinus) btnMinus.disabled = true;
+				if (btnPlus) btnPlus.disabled = false;
 
-				if (bar) { 
+				if (bar) {
 					bar.style.width = '0%';
 					bar.style.backgroundColor = getPenaltyProgressColor(0);
 					bar.classList.remove("sparkle");
@@ -1705,13 +1715,13 @@
 
 			const overlay = document.getElementById('custom-modal-overlay');
 			overlay.style.display = 'flex';
-			setTimeout(() => overlay.classList.add('show'), 10); 
+			setTimeout(() => overlay.classList.add('show'), 10);
 		}
 
 		function hideResetModal() {
 			const overlay = document.getElementById('custom-modal-overlay');
 			overlay.classList.remove('show');
-			setTimeout(() => overlay.style.display = 'none', 200); 
+			setTimeout(() => overlay.style.display = 'none', 200);
 			pendingResetType = null;
 		}
 
@@ -1731,7 +1741,7 @@
 					return;
 				}
 
-				e.preventDefault(); 
+				e.preventDefault();
 
 				const tabSearch = document.getElementById('tabSearch');
 				if (tabSearch) tabSearch.focus();
@@ -1776,15 +1786,15 @@
 				renderItemCategory(itemWofData, "item-wofs");
 
 				const itemCb = document.getElementById('itemHideCompletedCb');
-				if(itemCb) {
+				if (itemCb) {
 					itemCb.checked = itemHideCompleted;
-					if(itemHideCompleted) document.getElementById('itemHideCompletedWrapper').classList.add('active');
+					if (itemHideCompleted) document.getElementById('itemHideCompletedWrapper').classList.add('active');
 				}
 
 				const tcCb = document.getElementById('enableTarotClothCb');
-				if(tcCb) {
+				if (tcCb) {
 					tcCb.checked = tarotClothEnabled;
-					if(tarotClothEnabled) document.getElementById('enableTarotClothWrapper').classList.add('active');
+					if (tarotClothEnabled) document.getElementById('enableTarotClothWrapper').classList.add('active');
 				}
 
 				['item-generics', 'item-tarots', 'item-wofs'].forEach(id => {
@@ -1805,15 +1815,15 @@
 				renderPenaltyCategory(penaltyThreatData, "penalty-threats");
 
 				const penCb = document.getElementById('penHideCompletedCb');
-				if(penCb) {
+				if (penCb) {
 					penCb.checked = penHideCompleted;
-					if(penHideCompleted) document.getElementById('penHideCompletedWrapper').classList.add('active');
+					if (penHideCompleted) document.getElementById('penHideCompletedWrapper').classList.add('active');
 				}
 
 				const hsCb = document.getElementById('excludeHeatstrokeCb');
-				if(hsCb) {
+				if (hsCb) {
 					hsCb.checked = heatstrokeExcluded;
-					if(heatstrokeExcluded) document.getElementById('excludeHeatstrokeWrapper').classList.add('active');
+					if (heatstrokeExcluded) document.getElementById('excludeHeatstrokeWrapper').classList.add('active');
 				}
 
 				['penalty-generics', 'penalty-threats'].forEach(id => {
@@ -1830,7 +1840,11 @@
 					updatePenaltyStats();
 				}
 
-				updateGameStats();
+				const somSelect = document.getElementById('SoM-select');
+				if (somSelect) {
+					somSelect.value = som;
+					updateGameStats();
+				}
 
 				moveHeader();
 
