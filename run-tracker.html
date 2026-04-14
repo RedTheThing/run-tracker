@@ -60,6 +60,17 @@
 			background: var(--bg-color);
 		}
 
+		.game-stats-container {
+			position: fixed;
+			bottom: 25px;
+			right: 25px;
+			z-index: 1000;
+			padding: 5px;
+			border-radius: 12px;
+			border: 2px solid var(--border);
+			background: var(--bg-color);
+		}
+
 		.game-stats {
 			width: 100%;
 			display: flex;
@@ -496,16 +507,15 @@
 <body>
 
 	<div class="sticky-wrapper">
-		<span class="credit">
-			<a href="https://www.roblox.com/games/124686892107265/One-More-Night" target="_blank">Davdavmas' One More Night</a>
-			&nbsp;run tracker by&nbsp;
-			<strong>Me</strong>
-			&nbsp;
-			<img src="Me.webp" height="20px">
-			&nbsp;and&nbsp;
-			<strong>RedTheThing</strong>
-			.
-		</span>
+		<div class="tabs">
+			<button class="tab-btn active" data-target="items" onclick="switchTab('items')">Items</button>
+			<button class="tab-btn" data-target="penalties" onclick="switchTab('penalties')">Penalties</button>
+		</div>
+
+		<div id="header-controls" class="header-controls"></div>
+	</div>
+
+	<div class="game-stats-container">
 		<div class="game-stats">
 			<div class="game-stats-row">
 				<div class="power-stat"></div>
@@ -532,13 +542,6 @@
 				</div>
 			</div>
 		</div>
-
-		<div class="tabs">
-			<button class="tab-btn active" data-target="items" onclick="switchTab('items')">Items</button>
-			<button class="tab-btn" data-target="penalties" onclick="switchTab('penalties')">Penalties</button>
-		</div>
-
-		<div id="header-controls" class="header-controls"></div>
 	</div>
 
 	<main id="tab-items" class="tab-content dashboard active">
@@ -639,6 +642,16 @@
 			</div>
 		</div>
 	</div>
+	<span class="credit">
+		<a href="https://www.roblox.com/games/124686892107265/One-More-Night" target="_blank">Davdavmas' One More Night</a>
+		&nbsp;run tracker by&nbsp;
+		<strong>Me</strong>
+		&nbsp;
+		<img src="Me.webp" height="20px">
+		&nbsp;and&nbsp;
+		<strong>RedTheThing</strong>
+		.
+	</span>
 
 	<script>
 		function escapeId(id) { return id; }
