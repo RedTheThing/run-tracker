@@ -1,6 +1,9 @@
 {
-	"Disabler":{"image":"","cap":1},
+	"ClassicDoorOverheat":{"image":"","cap":1},
 	"EquipmentDisabler":{"image":"","cap":1},
+	"PowerGeneratorDisabler":{"image":"","cap":1},
+	"ClassicHoldableGenerator":{"image":"","cap":1},
+	"Disabler":{"image":"","cap":1},
 	"VoidboundBaby":{"image":"https://static.wikitide.net/onemorenightwiki/d/d0/BabyIcon.png","cap":1},
 	"WhenIFeelLikeIt":{"image":"https://static.wikitide.net/onemorenightwiki/b/bd/Bad%27sIcon.png","cap":1},
 	"ResilientTwins":{"image":"https://static.wikitide.net/onemorenightwiki/e/e5/BalloonChildrenIcon.png","cap":5},
