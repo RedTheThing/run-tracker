@@ -2,5 +2,6 @@
 	"Bloxy Cola!":{"image":"","chance":"5%","cap":4},
 	"Bloxiade!":{"image":"","chance":"5%","cap":4},
 	"Coffee!":{"image":"","chance":"5%","cap":4},
-	"Power!":{"image":"","chance":"10%","cap":7}
+	"Power!":{"image":"","chance":"10%","cap":7},
+	"Rigging Kit":{"image":"https://static.wikitide.net/onemorenightwiki/a/a1/RiggingKit.jpg","weight":45,"cap":1}
 }

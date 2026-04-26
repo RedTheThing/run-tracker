@@ -9,7 +9,6 @@
 	"Dumbell":{"image":"https://static.wikitide.net/onemorenightwiki/0/02/Dumbell.webp","weight":75,"cap":3, "key": "Dum"},
 	"Glass Pillar":{"image":"https://static.wikitide.net/onemorenightwiki/a/a9/GlassPillar.webp","weight":75,"cap":1, "key": "PilTra"},
 	"Turbo Mode":{"image":"https://static.wikitide.net/onemorenightwiki/2/23/TurboMode.webp","weight":20,"cap":1, "key": "PowGenCha"},
-	"Rigging Kit":{"image":"https://static.wikitide.net/onemorenightwiki/a/a1/RiggingKit.jpg","weight":45,"cap":1},
 	"Broken Stopwatch":{"image":"https://static.wikitide.net/onemorenightwiki/b/b4/BrokenStopwatch.webp","weight":15,"cap":1},
 	"Supply and Demand":{"image":"https://static.wikitide.net/onemorenightwiki/c/c0/SupplyAndDemand.jpg","weight":10,"cap":1},
 	"Broken Deal":{"image":"https://static.wikitide.net/onemorenightwiki/5/53/BrokenDeal.jpg","weight":25,"cap":1},
